@@ -1913,6 +1913,7 @@ export default function App() {
         <div className="flex-1 flex flex-col min-w-0 bg-[#F4F7FB]">
           
           {/* Header row for Mobile view / Status display for Web */}
+          {activeTab !== 'home' && (
           <header className={`bg-gradient-to-r from-[#0A1128] to-[#4A90D9] p-4 text-white shadow-sm shrink-0 md:bg-white md:text-slate-850 md:from-white md:to-white md:border-b md:border-[#D6E4F0] ${activeTab === 'practice' ? 'flex justify-center md:justify-start' : 'flex justify-between items-center'}`}>
             {activeTab === 'practice' ? (
               <h1 className="text-sm md:text-base font-black uppercase tracking-widest text-[#F5C518] md:text-[#0A1128]">
@@ -1967,8 +1968,9 @@ export default function App() {
               </div>
             )}
           </header>
+          )}
 
-          {/* Tab Content Canvas context */}
+          {/* Tab Content Canvas context */
           <div className={`flex-1 ${((activeTab === 'practice' && practiceSessionType === null) || activeTab === 'aitutor') ? 'overflow-hidden flex flex-col bg-[#F4F7FB] p-3 md:p-4 pb-4 md:pb-4' : 'overflow-y-auto p-4 md:p-6 pb-20 md:pb-6'} relative break-words`}>
             {activeTab === 'home' && renderHomeTab()}
             {activeTab === 'practice' && renderPracticeTab()}
@@ -2112,7 +2114,7 @@ export default function App() {
 
           <section className="mt-7">
             <div className="flex items-center justify-between mb-3"><h2 className={`text-lg font-black ${heading}`}>Recommended for you</h2><button type="button" onClick={() => setActiveTab('recommendations')} className="text-xs font-black text-[#2563EB]">See all</button></div>
-            <div className="rounded-2xl border border-dashed p-5 ${dark ? 'border-white/15 bg-white/[0.03]' : 'border-[#C9D8E8] bg-white'}">
+            <div className={`rounded-2xl border border-dashed p-5 ${dark ? 'border-white/15 bg-white/[0.03]' : 'border-[#C9D8E8] bg-white'}`}>
               <p className={`text-xs font-black ${heading}`}>Personalized recommendations are coming from SABI’s learning engine.</p>
               <button type="button" onClick={() => setActiveTab('recommendations')} className="mt-3 text-xs font-black text-[#2563EB]">View recommendations →</button>
             </div>
