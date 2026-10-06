@@ -150,6 +150,13 @@ export default function App() {
 
   // Home Dashboard States & Tabs
   const [activeTab, setActiveTab] = useState<'home' | 'practice' | 'blitz' | 'cbt' | 'progress' | 'recommendations' | 'mastery' | 'leaderboard' | 'profile' | 'settings' | 'aitutor' | 'mobile'>('home');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try { return localStorage.getItem('sabi-theme') === 'dark' ? 'dark' : 'light'; } catch { return 'light'; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('sabi-theme', theme); } catch {}
+  }, [theme]);
   const [selectedSubjectPractice, setSelectedSubjectPractice] = useState<SubjectName>('English Language');
   const [activeSessionTopicPractice, setActiveSessionTopicPractice] = useState<string>('');
   const [practiceSessionType, setPracticeSessionType] = useState<'smart' | 'custom' | null>(null);
@@ -1978,16 +1985,12 @@ export default function App() {
           </div>
           
           {/* Bottom Mobile Tab Bar (Hidden on Desktop) */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-[#0A1128] border-t border-slate-800 flex justify-around items-center z-50 shrink-0 select-none pb-1.5 px-2 text-white shadow-lg">
-            {tabsList.map((tab) => {
+          <div className={`md:hidden fixed bottom-0 left-0 right-0 h-[68px] border-t z-50 flex justify-around items-center pb-1 px-2 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#07152F]/95 border-white/10 text-white' : 'bg-white/95 border-[#DCE7F2] text-[#0B1220]'}`}>
+            {tabsList.filter(tab => ['home','practice','blitz','cbt','profile'].includes(tab.id)).map((tab) => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
-                  key={tab.id}
-                  onClick={tab.action}
-                  className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${isActive ? 'text-[#F5C518]' : 'text-[#9AACBF]/85'}`}
-                >
+                <button key={tab.id} onClick={tab.action} className={`min-w-[52px] min-h-[52px] flex flex-col items-center justify-center gap-1 rounded-2xl text-[9px] font-bold transition active:scale-95 ${isActive ? (theme === 'dark' ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]') : (theme === 'dark' ? 'text-white/55' : 'text-[#64748B]')}`}>
                   <IconComponent className="h-4.5 w-4.5" />
                   <span>{tab.label}</span>
                 </button>
@@ -2004,99 +2007,121 @@ export default function App() {
   function renderHomeTab() {
     if (!profile) return null;
 
+    const dark = theme === 'dark';
+    const page = dark ? 'bg-[#07152F] text-white' : 'bg-[#F8FAFC] text-[#0B1220]';
+    const muted = dark ? 'text-slate-300/75' : 'text-[#64748B]';
+    const surface = dark ? 'bg-[#0B1E3D] border-white/10' : 'bg-white border-[#DCE7F2]';
+    const subtle = dark ? 'bg-white/[0.045] border-white/10' : 'bg-[#F8FBFF] border-[#E3EDF7]';
+    const heading = dark ? 'text-white' : 'text-[#0B1220]';
+
     return (
-      <div className="space-y-4 animate-fade-in font-sans">
-        {/* Learning-state hero: never present client calculations as authoritative */}
-        <div className="sabi-surface p-5 md:p-6 relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-[#4A90D9]/5 pointer-events-none" />
-          <div className="relative">
-            <span className="text-[9px] uppercase font-black tracking-widest text-[#4A90D9]">Today's learning state</span>
-            <h2 className="text-2xl md:text-3xl font-black text-[#0A1128] mt-1">What should I do now?</h2>
-            <p className="text-sm text-slate-500 mt-2 max-w-2xl">SABI keeps the measurement and recommendation logic behind the interface. This dashboard presents the state supplied by the learning engine.</p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <button onClick={() => setActiveTab('practice')} className="px-4 py-2.5 rounded-xl bg-[#F5C518] text-[#0A1128] font-black text-xs uppercase tracking-wider">Practice</button>
-              <button onClick={() => setActiveTab('blitz')} className="px-4 py-2.5 rounded-xl bg-[#0A1128] text-white font-black text-xs uppercase tracking-wider">Blitz</button>
-              <button onClick={() => setActiveTab('cbt')} className="px-4 py-2.5 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-xs uppercase tracking-wider">CBT</button>
-              <button onClick={() => setActiveTab('recommendations')} className="px-4 py-2.5 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-xs uppercase tracking-wider">Focus area</button>
+      <div className={`min-h-full ${page} animate-fade-in`}>
+        <div className="max-w-xl mx-auto px-4 pt-3 pb-24">
+          <header className="flex items-center justify-between py-2 mb-5">
+            <div className="flex items-center gap-2">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg ${dark ? 'bg-white text-[#07152F]' : 'bg-[#2563EB] text-white'}`}>S</div>
+              <span className={`text-lg font-black tracking-tight ${heading}`}>SABI</span>
             </div>
-          </div>
-        </div>
-
-        {/* Activity summary: do not fabricate streak values before the learning API is connected */}
-        <div className="sabi-surface p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Award className="h-5 w-5 text-[#4A90D9] shrink-0" />
-            <div>
-              <p className="text-xs font-black text-[#0A1128]">Study activity</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Your streak, XP and activity history will appear here from the learning engine.</p>
+            <div className="flex items-center gap-2">
+              <button type="button" aria-label="Switch theme" onClick={() => setTheme(dark ? 'light' : 'dark')}
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition active:scale-95 ${subtle} ${heading}`}>
+                {dark ? '☀' : '☾'}
+              </button>
+              <button type="button" aria-label="Notifications" className={`w-10 h-10 rounded-full border flex items-center justify-center ${subtle} ${heading}`}>
+                <span className="relative text-base">♧<span className="absolute -right-1 -top-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border-2 border-current"></span></span>
+              </button>
+              <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-black text-sm ${dark ? 'bg-[#163A70] border-[#2E6FE8] text-white' : 'bg-[#EAF3FF] border-white text-[#2563EB]'}`}>
+                {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+              </div>
             </div>
-          </div>
-          <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black uppercase text-slate-400 shrink-0">Sync pending</span>
-        </div>
+          </header>
 
-        {/* Subject progress modules */}
-        <div className="space-y-2">
-          <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Subject learning evidence:</span>
-          <div className="grid grid-cols-1 gap-2">
-            {profile.chosenSubjects.map((subName) => {
-              const observedEvidence = (Object.values(masteryMap) as MasteryMapItem[])
-                .filter(t => t.subject === subName)
-                .reduce((sum, item) => sum + item.attempts, 0);
-              const selfReportedConfidence = profile.subjectConfidence[subName];
+          <section className="mb-6">
+            <p className={`text-sm font-semibold ${muted}`}>Good morning, {profile.name.split(' ')[0] || 'there'}.</p>
+            <h1 className={`text-[30px] leading-[1.08] font-black tracking-[-0.04em] mt-1 ${heading}`}>Let’s move your JAMB preparation forward.</h1>
+          </section>
 
-              return (
-                <div
-                  key={subName}
-                  onClick={() => {
-                    setMapSubject(subName);
-                    setActiveTab('mastery');
-                  }}
-                  className="bg-white border border-[#D6E4F0] p-3 rounded-xl flex justify-between items-center cursor-pointer hover:border-[#4A90D9] transition shadow-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-slate-50 text-[#0A1128] border border-slate-100">
-                      <BookOpen className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-[#0A1128] truncate max-w-[170px]">{subName}</p>
-                      <p className="text-[9px] text-slate-400 mt-0.5">{observedEvidence} observed question{observedEvidence === 1 ? '' : 's'} • self-report confidence {selfReportedConfidence}/5</p>
-                    </div>
+          <section className={`rounded-[24px] border overflow-hidden relative ${dark ? 'bg-[#0A2B62] border-[#2563EB]/70' : 'bg-[#0A2B62] border-[#2563EB]'} text-white p-5 shadow-sm`}>
+            <div className="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35"></div>
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black tracking-[0.16em] text-[#BFD7FF] uppercase">Your next move</span>
+                <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-[9px] font-bold">Learning engine</span>
+              </div>
+              <p className="text-xs font-bold text-[#CFE0FF]">Chemistry</p>
+              <h2 className="text-[25px] leading-tight font-black mt-1">Atomic Structure</h2>
+              <div className="flex gap-4 mt-4 text-[11px] text-white/75">
+                <span>10 questions</span><span>≈ 15 mins</span>
+              </div>
+              <button type="button" onClick={() => { setActiveTab('practice'); setPracticeSessionType('smart'); }}
+                className="w-full mt-5 h-12 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm flex items-center justify-center gap-2 active:scale-[.98] transition">
+                Continue practice <span className="text-lg">→</span>
+              </button>
+            </div>
+          </section>
+
+          <section className="mt-7">
+            <div className="flex items-end justify-between mb-3">
+              <div><p className={`text-[10px] uppercase tracking-[0.16em] font-black ${muted}`}>Your learning space</p><h2 className={`text-xl font-black mt-1 ${heading}`}>Choose how you want to learn.</h2></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                ['Practice','Sharpen your understanding.','✣','practice'],
+                ['Smart Practice','Focus on what matters.','◎','practice'],
+                ['Blitz','Quick practice to keep momentum.','ϟ','blitz'],
+                ['CBT','Simulate the real JAMB experience.','▣','cbt']
+              ].map(([title,desc,icon,target]) => (
+                <button key={title} type="button" onClick={() => { setActiveTab(target as any); if(target==='practice') setPracticeSessionType(title==='Smart Practice'?'smart':null); }}
+                  className={`min-h-[142px] rounded-[20px] border p-4 text-left transition active:scale-[.98] ${surface}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black mb-4 ${title==='Blitz' ? 'bg-[#FFF4C7] text-[#8A6900]' : dark ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]'}`}>{icon}</div>
+                  <h3 className={`text-sm font-black ${heading}`}>{title}</h3>
+                  <p className={`text-[10px] leading-relaxed mt-1 ${muted}`}>{desc}</p>
+                  <span className="block mt-3 text-xs font-black text-[#2563EB]">Open →</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className={`mt-7 rounded-[22px] border p-4 ${surface}`}>
+            <div className="flex items-center justify-between">
+              <div><p className={`text-[10px] uppercase tracking-[0.16em] font-black ${muted}`}>Learning evidence</p><h2 className={`text-lg font-black mt-1 ${heading}`}>Your progress</h2></div>
+              <button type="button" onClick={() => setActiveTab('progress')} className="text-xs font-black text-[#2563EB]">See details</button>
+            </div>
+            <div className="flex items-center gap-5 mt-5">
+              <div className={`w-28 h-28 rounded-full border-[10px] flex items-center justify-center shrink-0 ${dark ? 'border-[#163A70]' : 'border-[#E7EEF7]'}`}>
+                <div className="text-center"><span className={`block text-2xl font-black ${heading}`}>—</span><span className={`block text-[8px] font-bold ${muted}`}>backend state</span></div>
+              </div>
+              <div className="flex-1 space-y-3">
+                {(profile.chosenSubjects || []).slice(0,4).map(subject => (
+                  <div key={subject}>
+                    <div className="flex justify-between text-[10px] font-bold"><span className={heading}>{subject}</span><span className={muted}>Evidence pending</span></div>
+                    <div className={`h-1.5 rounded-full mt-1 overflow-hidden ${dark ? 'bg-white/10' : 'bg-[#E7EEF7]'}`}><div className="h-full w-1/4 bg-[#2563EB] rounded-full opacity-70"></div></div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
+            <p className={`text-[10px] leading-relaxed mt-4 ${muted}`}>SABI will show authoritative mastery and readiness here when the learning engine syncs.</p>
+          </section>
 
-        {/* Recommendation surface: backend-owned */}
-        <div className="bg-[#0A1128] border-2 border-[#0A1128] rounded-2xl p-5 text-white relative overflow-hidden shadow-lg">
-          <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-white/10" />
-          <span className="text-[8px] bg-[#F5C518] text-[#0A1128] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Learning engine</span>
-          <h3 className="text-base font-black mt-3">Your next study action</h3>
-          <p className="text-[11px] text-sky-100 leading-relaxed mt-1.5">
-            SABI will show the next recommended subject, topic, reason and duration here when recommendation data is available.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-2 mt-4">
-            <button
-              onClick={() => setActiveTab('recommendations')}
-              className="w-full py-2.5 bg-[#F5C518] text-[#0A1128] font-black text-[10px] uppercase tracking-wider rounded-xl hover:bg-yellow-400 transition"
-            >
-              View recommendations
-            </button>
-            <button
-              onClick={() => { setActiveTab('practice'); setPracticeSessionType(null); }}
-              className="w-full py-2.5 bg-transparent border-2 border-white/20 text-sky-100 font-black text-[10px] uppercase tracking-wider rounded-xl hover:bg-white/5 transition"
-            >
-              Practice on your own
-            </button>
-          </div>
+          <section className="mt-7">
+            <div className="flex items-center justify-between mb-3"><h2 className={`text-lg font-black ${heading}`}>Recent activity</h2><button type="button" onClick={() => setActiveTab('progress')} className="text-xs font-black text-[#2563EB]">See all</button></div>
+            <div className="space-y-2">
+              <div className={`rounded-2xl border p-4 flex items-center gap-3 ${subtle}`}><div className="w-9 h-9 rounded-xl bg-[#EAF3FF] text-[#2563EB] flex items-center justify-center">↗</div><div className="min-w-0 flex-1"><p className={`text-xs font-black ${heading}`}>Your learning history</p><p className={`text-[10px] mt-0.5 ${muted}`}>Activity will appear here from the learning engine.</p></div><span className={`text-[9px] font-bold ${muted}`}>Pending</span></div>
+            </div>
+          </section>
+
+          <section className="mt-7">
+            <div className="flex items-center justify-between mb-3"><h2 className={`text-lg font-black ${heading}`}>Recommended for you</h2><button type="button" onClick={() => setActiveTab('recommendations')} className="text-xs font-black text-[#2563EB]">See all</button></div>
+            <div className="rounded-2xl border border-dashed p-5 ${dark ? 'border-white/15 bg-white/[0.03]' : 'border-[#C9D8E8] bg-white'}">
+              <p className={`text-xs font-black ${heading}`}>Personalized recommendations are coming from SABI’s learning engine.</p>
+              <button type="button" onClick={() => setActiveTab('recommendations')} className="mt-3 text-xs font-black text-[#2563EB]">View recommendations →</button>
+            </div>
+          </section>
         </div>
       </div>
     );
   }
 
-  // --- SUB-PANE: BLITZ / PROGRESS / CBT / RECOMMENDATIONS ---
   function renderBlitzTab() {
     const blitzQuestion = practiceQuestions[0] || SEED_QUESTIONS.find(q => profile?.chosenSubjects.includes(q.subject)) || SEED_QUESTIONS[0];
     const hasAnswer = practiceSelectedAnswer !== null;
