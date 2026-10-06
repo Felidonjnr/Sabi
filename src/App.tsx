@@ -3056,18 +3056,113 @@ export default function App() {
     }
 
     const currentQ = practiceQuestions[practiceIndex];
+    if (!currentQ) return null;
     const progress = ((practiceIndex + (practiceHasSubmitted ? 1 : 0)) / practiceQuestions.length) * 100;
+    const answered = practiceSelectedAnswer !== null;
+    const correct = answered && practiceSelectedAnswer === currentQ.answer;
+
     return (
-      <div className="flex flex-col animate-fade-in relative">
-        {showExitQuizModal && <div className="absolute inset-0 z-50 bg-slate-900/50 backdrop-blur-sm rounded-3xl flex items-center justify-center p-4"><div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm"><h3 className="text-lg font-black text-[#0A1128]">Leave this practice session?</h3><p className="text-xs text-slate-500 mt-2">Current preview answers are local only.</p><div className="grid grid-cols-2 gap-2 mt-5"><button onClick={() => setShowExitQuizModal(false)} className="py-3 rounded-xl border border-slate-200 text-xs font-black">Stay</button><button onClick={handleQuizExitAndSave} className="py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black">Exit Preview</button></div></div></div>}
-        <div className="rounded-3xl bg-[#0A1128] text-white p-4 md:p-5 relative overflow-hidden"><div className="relative"><div className="flex items-center justify-between gap-3"><button onClick={() => setShowExitQuizModal(true)} className="flex items-center gap-1 text-[10px] font-black uppercase text-white/60"><ChevronLeft className="w-4 h-4" /> Exit</button><div className="text-center"><span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#F5C518] block">{practiceSessionType === 'smart' ? 'Smart Practice' : 'Custom Practice'}</span><span className="text-[10px] text-white/55 block mt-1">{currentQ.subject}</span></div><span className="text-[10px] font-black font-mono text-white/70">{practiceIndex + 1}/${practiceQuestions.length}</span></div><div className="mt-5 h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-[#F5C518] rounded-full" style={{width: Math.min(100, progress) + '%'}} /></div><div className="flex justify-between mt-3 text-[9px] font-bold text-white/50 uppercase"><span>{currentQ.topic}</span><span>{currentQ.difficulty} difficulty</span></div></div></div>
-        <div className="grid lg:grid-cols-3 gap-4 mt-4"><main className="lg:col-span-2 rounded-3xl border border-[#D6E4F0] bg-white p-5 md:p-7 shadow-sm"><div className="flex justify-between mb-5"><span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#4A90D9]">Question {practiceIndex + 1}</span><span className="text-[9px] font-bold text-slate-400">Preview question</span></div><div className="text-base md:text-lg font-bold text-[#0A1128] leading-[1.8]"><MathText text={currentQ.question} /></div><div className="space-y-2.5 mt-7">{Object.entries(currentQ.options).map(([key, value]) => { const correct = key === currentQ.answer, selected = practiceSelectedAnswer === key; let style = 'border-slate-200 bg-white hover:border-[#4A90D9] hover:bg-[#F8FBFF] text-slate-700'; if (practiceHasSubmitted) style = selected && correct ? 'border-emerald-500 bg-emerald-50 text-emerald-950' : selected ? 'border-rose-500 bg-rose-50 text-rose-950' : correct ? 'border-emerald-500 bg-emerald-50 text-emerald-950' : 'border-slate-100 bg-slate-50 text-slate-400 opacity-60'; else if (selected) style = 'border-[#0A1128] bg-[#F4F7FB] text-[#0A1128] ring-2 ring-[#0A1128]/5'; return <button key={key} type="button" disabled={practiceHasSubmitted} onClick={() => !practiceHasSubmitted && setPracticeSelectedAnswer(key as any)} className={'w-full p-4 rounded-2xl border text-left transition flex items-start gap-3 ' + style}><span className={'w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-[10px] font-black border ' + (selected ? 'bg-[#0A1128] text-[#F5C518] border-[#0A1128]' : 'bg-slate-50 text-slate-500 border-slate-200')}>{key}</span><span className="text-sm leading-relaxed pt-1"><MathText text={value as string} /></span></button>; })}</div>{practiceHasSubmitted && <div className="mt-5 rounded-2xl border border-[#D6E4F0] bg-[#F8FAFC] p-4">{!aiExplainText && !aiExplainLoading ? <div className="flex items-center justify-between gap-4"><div><p className="text-[9px] font-black uppercase tracking-wider text-[#4A90D9]">Sabi AI Coach</p><p className="text-[11px] text-slate-500 mt-1">See a step-by-step explanation.</p></div><button onClick={fetchPracticeExplanation} className="px-4 py-2.5 rounded-xl bg-[#0A1128] text-[#F5C518] text-[10px] font-black">Explain</button></div> : aiExplainLoading ? <div className="flex items-center gap-2 text-[#4A90D9] text-[10px]"><Loader2 className="h-4 w-4 animate-spin" /> Coach is drafting an explanation…</div> : <div><span className="text-[9px] uppercase font-black tracking-wider text-[#4A90D9]">Worked explanation</span><div className="text-xs text-slate-800 leading-relaxed mt-2"><MathText text={aiExplainText} /></div></div>}</div>}<div className="mt-6"><button onClick={practiceHasSubmitted ? handleNextPracticeStep : handleSubmitPracticeChoice} disabled={!practiceHasSubmitted && !practiceSelectedAnswer} className={'w-full py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider ' + (practiceHasSubmitted ? 'bg-[#0A1128] text-white' : practiceSelectedAnswer ? 'bg-[#F5C518] text-[#0A1128]' : 'bg-slate-100 text-slate-400 cursor-not-allowed')}>{practiceHasSubmitted ? (practiceIndex === practiceQuestions.length - 1 ? 'Finish Session' : 'Next Question') : 'Submit Answer'}</button></div></main>
-        <aside className="rounded-3xl border border-[#D6E4F0] bg-white p-5 h-fit"><div className="flex items-center gap-2 mb-4"><span className="w-9 h-9 rounded-xl bg-[#EBF1FA] flex items-center justify-center"><Info className="w-4 h-4 text-[#4A90D9]" /></span><h4 className="text-sm font-black text-[#0A1128]">Practice guide</h4></div><div className="space-y-4"><div><span className="text-[9px] font-black uppercase text-slate-400">1. Choose</span><p className="text-[10px] text-slate-500 mt-1">Select one answer before submitting.</p></div><div><span className="text-[9px] font-black uppercase text-slate-400">2. Review</span><p className="text-[10px] text-slate-500 mt-1">Review the answer and explanation after submission.</p></div><div><span className="text-[9px] font-black uppercase text-slate-400">3. Learn</span><p className="text-[10px] text-slate-500 mt-1">Production learning evidence will be handled by the backend.</p></div></div><div className="mt-5 rounded-2xl bg-amber-50 border border-amber-200 p-3"><p className="text-[9px] font-black uppercase text-amber-900">Preview boundary</p><p className="text-[10px] text-amber-800 mt-1">No XP, mastery, readiness, recommendation or JAMB score changes here.</p></div></aside></div>
+      <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
+        {showExitQuizModal && (
+          <div className="fixed inset-0 z-[80] bg-[#07152F]/75 backdrop-blur-sm flex items-center justify-center p-5">
+            <div className="w-full max-w-sm rounded-[24px] bg-white text-[#0B1220] p-5">
+              <h3 className="text-xl font-black">Leave this session?</h3>
+              <p className="text-sm text-[#64748B] mt-2">Your preview answers are local only.</p>
+              <div className="grid grid-cols-2 gap-2 mt-5">
+                <button type="button" onClick={() => setShowExitQuizModal(false)} className="h-12 rounded-2xl border border-[#DCE7F2] font-black text-sm">Stay</button>
+                <button type="button" onClick={handleQuizExitAndSave} className="h-12 rounded-2xl bg-[#07152F] text-white font-black text-sm">Exit</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-xl mx-auto px-4 pt-4">
+          <header className="flex items-center justify-between">
+            <button type="button" onClick={() => setShowExitQuizModal(true)} className="flex items-center gap-1 text-xs font-black text-white/65"><ChevronLeft className="w-4 h-4" /> Exit</button>
+            <div className="text-center">
+              <span className="block text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">{practiceSessionType === 'smart' ? 'Smart Practice' : 'Custom Practice'}</span>
+              <span className="block text-[10px] text-white/55 mt-1">{currentQ.subject}</span>
+            </div>
+            <span className="text-xs font-black font-mono text-white/70">{practiceIndex + 1}/{practiceQuestions.length}</span>
+          </header>
+
+          <div className="mt-5">
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-[#F5C518] rounded-full transition-all" style={{width: Math.min(100,progress)+'%'}} /></div>
+            <div className="flex justify-between mt-2 text-[9px] font-bold uppercase tracking-wider text-white/40"><span>{currentQ.topic}</span><span>{currentQ.difficulty}</span></div>
+          </div>
+
+          <main className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-[9px] font-black uppercase tracking-wider text-white/70">{currentQ.exam_type}</span>
+              <span className="text-[10px] text-white/35">{currentQ.year}</span>
+            </div>
+
+            <h1 className="text-[25px] leading-[1.38] font-black tracking-[-0.025em]">
+              <MathText text={currentQ.question} />
+            </h1>
+
+            <div className="space-y-2.5 mt-8">
+              {(['A','B','C','D'] as const).map(option => {
+                const selected = practiceSelectedAnswer === option;
+                const isRight = option === currentQ.answer;
+                const state = !answered ? (selected ? 'selected' : 'idle') : (isRight ? 'correct' : selected ? 'wrong' : 'muted');
+                return (
+                  <button key={option} type="button" disabled={answered} onClick={() => setPracticeSelectedAnswer(option)}
+                    className={`w-full min-h-[68px] rounded-[20px] border-2 px-4 py-3.5 flex items-center gap-3 text-left transition active:scale-[.99] ${state==='selected' ? 'bg-[#1457C7] border-[#4C8DFF] text-white' : state==='correct' ? 'bg-[#0F5132] border-[#2FBF71] text-white' : state==='wrong' ? 'bg-[#642D35] border-[#E56B7A] text-white' : state==='muted' ? 'bg-white/[0.035] border-white/5 text-white/35' : 'bg-white/[0.045] border-white/10 text-white hover:border-white/25'}`}>
+                    <span className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center font-black text-sm ${state==='selected' ? 'bg-white text-[#1457C7]' : state==='correct' ? 'bg-[#2FBF71] text-[#07152F]' : state==='wrong' ? 'bg-[#E56B7A] text-[#07152F]' : 'bg-white/10 text-white/65'}`}>{option}</span>
+                    <span className="text-sm leading-relaxed"><MathText text={currentQ.options[option]} /></span>
+                    {state==='correct' && <CheckCircle className="w-5 h-5 ml-auto shrink-0 text-[#65E3A0]" />}
+                    {state==='wrong' && <XCircle className="w-5 h-5 ml-auto shrink-0 text-[#FF9AA6]" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {!answered && (
+              <p className="text-[10px] text-white/35 text-center mt-5">Choose the answer you believe is correct.</p>
+            )}
+
+            {answered && (
+              <section className={`mt-6 rounded-[22px] border p-5 ${correct ? 'bg-[#0F5132]/35 border-[#2FBF71]/40' : 'bg-[#642D35]/35 border-[#E56B7A]/35'}`}>
+                <div className="flex items-center gap-2">
+                  {correct ? <CheckCircle className="w-5 h-5 text-[#65E3A0]" /> : <XCircle className="w-5 h-5 text-[#FF9AA6]" />}
+                  <span className="text-sm font-black">{correct ? 'Correct.' : 'Not quite.'}</span>
+                </div>
+                {!correct && <p className="text-xs text-white/75 mt-2">Think about the key idea behind the question before moving on.</p>}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-white/45">Why</span>
+                  <p className="text-sm text-white/80 leading-relaxed mt-1.5"><MathText text={currentQ.explanation_short || currentQ.explanation} /></p>
+                </div>
+              </section>
+            )}
+
+            <div className="mt-6">
+              {answered ? (
+                <button type="button" onClick={() => {
+                  if (practiceIndex < practiceQuestions.length - 1) {
+                    setPracticeIndex(i => i + 1); setPracticeSelectedAnswer(null); setPracticeHasSubmitted(false);
+                  } else {
+                    setPracticeComplete(true);
+                  }
+                }} className="w-full h-13 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm active:scale-[.99] transition">
+                  {practiceIndex < practiceQuestions.length - 1 ? 'Continue →' : 'Finish session →'}
+                </button>
+              ) : (
+                <button type="button" disabled={!practiceSelectedAnswer} onClick={() => setPracticeHasSubmitted(true)}
+                  className="w-full h-13 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm disabled:opacity-35 transition">Check answer</button>
+              )}
+            </div>
+
+            <div className="mt-7 pt-5 border-t border-white/10 flex items-center justify-between text-[9px] text-white/35">
+              <span>Learning mode</span><span>Preview session</span>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
 
-  // --- SUB-PANE: DASHBOARD MASTERY MAP CORE ---
+
   function renderMasteryTab() {
     return (
       <MasteryMap
