@@ -3058,7 +3058,7 @@ export default function App() {
     const currentQ = practiceQuestions[practiceIndex];
     if (!currentQ) return null;
     const progress = ((practiceIndex + (practiceHasSubmitted ? 1 : 0)) / practiceQuestions.length) * 100;
-    const answered = practiceSelectedAnswer !== null;
+    const answered = practiceHasSubmitted;
     const correct = answered && practiceSelectedAnswer === currentQ.answer;
 
     return (
@@ -3144,7 +3144,7 @@ export default function App() {
                   } else {
                     setPracticeComplete(true);
                   }
-                }} className="w-full h-13 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm active:scale-[.99] transition">
+                }} className="w-full min-h-[52px] rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm active:scale-[.99] transition">
                   {practiceIndex < practiceQuestions.length - 1 ? 'Continue →' : 'Finish session →'}
                 </button>
               ) : (
