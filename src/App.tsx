@@ -2085,7 +2085,7 @@ export default function App() {
           </section>
 
           <section className={`rounded-[24px] border overflow-hidden relative ${dark ? 'bg-[#0A2B62] border-[#2563EB]/70' : 'bg-[#0A2B62] border-[#2563EB]'} text-white p-5 shadow-sm`}>
-            <div className="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35"></div>
+            <div className="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35 pointer-events-none"></div>
             <div className="relative">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[10px] font-black tracking-[0.16em] text-[#BFD7FF] uppercase">Your next move</span>
@@ -2317,8 +2317,8 @@ export default function App() {
     return (
       <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
         <section className="relative overflow-hidden rounded-[28px] bg-white border border-slate-200 p-5 md:p-8">
-          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#2563EB]/[0.06]" />
-          <div className="absolute right-16 -bottom-28 h-52 w-52 rounded-full bg-[#F5C518]/[0.08]" />
+          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#2563EB]/[0.06] pointer-events-none" />
+          <div className="absolute right-16 -bottom-28 h-52 w-52 rounded-full bg-[#F5C518]/[0.08] pointer-events-none" />
           <div className="relative max-w-3xl">
             <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#2563EB]">Progress Room</span>
             <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0B1220] mt-2">You’re getting stronger.</h2>
@@ -2480,7 +2480,7 @@ export default function App() {
     return (
       <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
         <section className="rounded-[28px] bg-[#07152F] text-white p-5 md:p-8 overflow-hidden relative">
-          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#2563EB]/20 blur-3xl" />
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#2563EB]/20 blur-3xl pointer-events-none" />
           <div className="relative max-w-3xl">
             <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Next Move</span>
             <h2 className="text-3xl md:text-5xl font-black tracking-tight mt-2">Know what to do next.</h2>
@@ -2681,7 +2681,7 @@ export default function App() {
         <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
           <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
             <header className="flex items-center justify-between"><button type="button" onClick={resetCbtPreview} className="w-10 h-10 rounded-full border border-[#DCE7F2] bg-white flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button><div className="text-center"><span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam submitted</span><span className="block text-[10px] text-[#64748B] mt-1">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'}</span></div><div className="w-10 h-10" /></header>
-            <section className="rounded-[28px] bg-[#07152F] text-white p-6 overflow-hidden relative"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Preview result</span><h1 className="text-2xl font-black mt-2">Mock submitted.</h1><p className="text-sm text-white/60 mt-2 leading-relaxed">This is a UI simulation. It is not an official JAMB score and does not update SABI's authoritative learning record.</p></div></section>
+            <section className="rounded-[28px] bg-[#07152F] text-white p-6 overflow-hidden relative"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20 pointer-events-none" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Preview result</span><h1 className="text-2xl font-black mt-2">Mock submitted.</h1><p className="text-sm text-white/60 mt-2 leading-relaxed">This is a UI simulation. It is not an official JAMB score and does not update SABI's authoritative learning record.</p></div></section>
             <div className="grid grid-cols-3 gap-2"><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Answered</span><p className="text-xl font-black font-mono mt-1">{answeredQuestions.length}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Blank</span><p className="text-xl font-black font-mono mt-1">{unansweredCount}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Accuracy</span><p className="text-xl font-black font-mono mt-1">{accuracy}%</p></div></div>
             <section className="rounded-[24px] bg-white border border-[#DCE7F2] p-5"><div className="flex items-center justify-between"><div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Answer map</span><h2 className="text-lg font-black mt-1">How the mock went</h2></div><span className="text-[9px] font-black uppercase tracking-wider text-[#94A3B8]">{flaggedCount} flagged</span></div><div className="grid grid-cols-8 gap-1.5 mt-5">{cbtPreviewQuestions.map((q,index) => { const answered=Boolean(cbtPreviewAnswers[q.id]); const correct=answered&&cbtPreviewAnswers[q.id]===q.answer; const flagged=Boolean(cbtPreviewFlagged[q.id]); return <div key={q.id} className={`relative h-8 rounded-lg border flex items-center justify-center text-[8px] font-black ${correct?'bg-emerald-50 border-emerald-200 text-emerald-700':answered?'bg-rose-50 border-rose-200 text-rose-700':'bg-slate-50 border-slate-200 text-slate-400'}`}>{index+1}{flagged&&<span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F5C518] border border-white" />}</div>; })}</div></section>
             <section className="rounded-[24px] border border-[#DCE7F2] bg-[#F4F8FD] p-5"><div className="flex items-start gap-3"><ShieldAlert className="w-4 h-4 text-[#64748B] mt-0.5" /><div><span className="text-[9px] uppercase tracking-wider font-black text-[#64748B]">Exam data boundary</span><p className="text-xs text-[#64748B] leading-relaxed mt-1">Official score, result persistence, readiness and learning updates belong to the backend exam service.</p></div></div></section>
@@ -2705,7 +2705,7 @@ export default function App() {
       <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
         <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
           <header><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam Room</span><h1 className="text-[30px] leading-tight tracking-[-0.04em] font-black mt-1">Test yourself under pressure.</h1><p className="text-sm text-[#64748B] mt-2 leading-relaxed">Choose a mock, enter a focused exam environment, and practise making decisions under time pressure.</p></header>
-          <section className="rounded-[28px] bg-[#07152F] text-white p-6 relative overflow-hidden"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">CBT simulator</span><h2 className="text-xl font-black mt-2">A separate room for exam conditions.</h2><p className="text-xs text-white/55 mt-2 leading-relaxed">The production exam service will own timing, state, autosave, submission and scoring. This build previews the experience.</p></div></section>
+          <section className="rounded-[28px] bg-[#07152F] text-white p-6 relative overflow-hidden"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20 pointer-events-none" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">CBT simulator</span><h2 className="text-xl font-black mt-2">A separate room for exam conditions.</h2><p className="text-xs text-white/55 mt-2 leading-relaxed">The production exam service will own timing, state, autosave, submission and scoring. This build previews the experience.</p></div></section>
           <div className="space-y-3">
             {[{mode:'full' as const,label:'Full Mock',count:180,duration:'120 min',copy:'A complete-length exam environment.'},{mode:'quick' as const,label:'Quick Mock',count:40,duration:'30 min',copy:'A shorter simulation for focused practice.'}].map(item => (
               <button key={item.mode} type="button" onClick={() => startPreview(item.mode)} className="w-full text-left rounded-[24px] bg-white border border-[#DCE7F2] p-5 active:scale-[0.99] transition">
@@ -2769,7 +2769,7 @@ export default function App() {
 
             <button type="button" onClick={() => handleStartSmartPractice(activeSmartSubject)}
               className="w-full text-left rounded-[24px] bg-[#07152F] text-white p-5 relative overflow-hidden shadow-sm active:scale-[.99] transition">
-              <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35"></div>
+              <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35 pointer-events-none"></div>
               <div className="relative">
                 <div className="flex items-center justify-between"><span className="text-[10px] uppercase tracking-[0.16em] font-black text-[#F5C518]">Recommended</span><Sparkles className="w-5 h-5 text-[#F5C518]" /></div>
                 <h2 className="text-2xl font-black mt-3">Smart Practice</h2>
@@ -2841,8 +2841,8 @@ export default function App() {
             </header>
 
             <section className="relative overflow-hidden rounded-[28px] bg-[#07152F] text-white p-6 md:p-7">
-              <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" />
-              <div className="absolute -left-12 -bottom-16 w-36 h-36 rounded-full bg-[#F5C518]/10" />
+              <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20 pointer-events-none" />
+              <div className="absolute -left-12 -bottom-16 w-36 h-36 rounded-full bg-[#F5C518]/10 pointer-events-none" />
               <div className="relative">
                 <div className="flex items-start justify-between gap-4">
                   <div>
