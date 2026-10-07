@@ -1838,14 +1838,23 @@ export default function App() {
       { id: 'blitz', label: 'Blitz', icon: Zap, action: () => setActiveTab('blitz') },
       { id: 'cbt', label: 'CBT', icon: FileText, action: () => setActiveTab('cbt') },
       { id: 'progress', label: 'Progress', icon: ArrowUpRight, action: () => setActiveTab('progress') },
+      { id: 'recommendations', label: 'Next Move', icon: ChevronRight, action: () => setActiveTab('recommendations') },
+      { id: 'aitutor', label: 'AI Coach', icon: Sparkles, action: () => setActiveTab('aitutor') },
       { id: 'profile', label: 'Profile', icon: User, action: () => setActiveTab('profile') },
       { id: 'settings', label: 'Settings', icon: Settings, action: () => setActiveTab('settings') },
     ];
 
-    const focusRoom = activeTab === 'blitz' || activeTab === 'cbt' || activeTab === 'aitutor' || (activeTab === 'practice' && practiceSessionType !== null);
+    const focusRoom =
+      activeTab === 'blitz' ||
+      activeTab === 'cbt' ||
+      activeTab === 'aitutor' ||
+      (activeTab === 'practice' && practiceSessionType !== null);
 
     const pageNames: Record<string, { title: string; subtitle: string }> = {
-      practice: { title: practiceSessionType === 'smart' ? 'Smart Practice' : practiceSessionType === 'custom' ? 'Custom Practice' : 'Practice', subtitle: 'Choose how you want to work.' },
+      practice: {
+        title: practiceSessionType === 'smart' ? 'Smart Practice' : practiceSessionType === 'custom' ? 'Custom Practice' : 'Practice',
+        subtitle: 'Choose how you want to work.'
+      },
       progress: { title: 'Progress Room', subtitle: 'See the learning evidence SABI has collected.' },
       recommendations: { title: 'Next Move', subtitle: 'Know what to do next.' },
       mastery: { title: 'Learning Evidence', subtitle: 'Explore your learning map.' },
@@ -1856,92 +1865,134 @@ export default function App() {
     };
 
     const currentPage = pageNames[activeTab] || { title: 'SABI', subtitle: '' };
+    const firstName = (profile.name || 'there').trim().split(' ')[0] || 'there';
 
     return (
-      <div className="flex-1 flex flex-col md:flex-row bg-[#F8FAFC] text-[#0B1220] animate-fade-in shrink-0 relative min-h-[600px] overflow-hidden border border-[#DCE7F2] shadow-sm">
-        <aside className="hidden md:flex md:w-[248px] bg-white flex-col justify-between shrink-0 border-r border-[#E5EDF6] z-30">
-          <div>
+      <div className="flex-1 flex flex-col md:flex-row bg-[#F8FAFC] text-[#0B1220] animate-fade-in shrink-0 relative min-h-[600px] overflow-hidden border border-[#DCE7F2]">
+        {/* Desktop learning-room navigation */}
+        <aside className="hidden md:flex md:w-[232px] bg-[#07152F] text-white flex-col shrink-0 border-r border-white/10 z-30">
+          <div className="flex-1 overflow-y-auto">
             <div className="px-5 pt-6 pb-5">
-              <button type="button" onClick={() => setActiveTab('home')} className="flex items-center gap-2.5 text-left">
-                <span className="w-9 h-9 rounded-xl bg-[#07152F] text-white flex items-center justify-center font-black text-lg">S</span>
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex items-center gap-3 text-left group"
+                aria-label="Go to SABI Home"
+              >
+                <span className="w-9 h-9 rounded-xl bg-white text-[#07152F] flex items-center justify-center font-black text-lg group-hover:scale-[1.02] transition">
+                  S
+                </span>
                 <span>
-                  <span className="block text-[15px] font-black tracking-tight">SABI</span>
-                  <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-[#94A3B8] mt-0.5">JAMB learning</span>
+                  <span className="block text-[16px] font-black tracking-tight">SABI</span>
+                  <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-white/45 mt-0.5">
+                    JAMB learning
+                  </span>
                 </span>
               </button>
             </div>
 
-            <nav className="px-3 space-y-1">
-              <p className="px-3 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Learn</p>
-              {tabsList.slice(0, 5).map(tab => {
+            <nav className="px-3 pb-5">
+              <p className="px-3 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-white/35">Learning</p>
+              {tabsList.slice(0, 7).map(tab => {
                 const IconComponent = tab.icon;
-                const isActive = activeTab === tab.id && !focusRoom;
+                const isActive = activeTab === tab.id;
                 return (
-                  <button key={tab.id} type="button" onClick={tab.action}
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={tab.action}
+                    aria-current={isActive ? 'page' : undefined}
                     className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
-                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
-                    }`}>
+                      isActive
+                        ? 'bg-[#1457C7] text-white shadow-[inset_3px_0_0_#F5C518]'
+                        : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                    }`}
+                  >
                     <IconComponent className="w-4 h-4 shrink-0" />
                     <span>{tab.label}</span>
-                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F5C518]" />}
                   </button>
                 );
               })}
 
-              <p className="px-3 pt-5 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Account</p>
-              {tabsList.slice(5).map(tab => {
+              <p className="px-3 pt-6 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-white/35">Account</p>
+              {tabsList.slice(7).map(tab => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
-                  <button key={tab.id} type="button" onClick={tab.action}
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={tab.action}
+                    aria-current={isActive ? 'page' : undefined}
                     className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
-                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
-                    }`}>
+                      isActive
+                        ? 'bg-[#1457C7] text-white shadow-[inset_3px_0_0_#F5C518]'
+                        : 'text-white/60 hover:bg-white/[0.06] hover:text-white'
+                    }`}
+                  >
                     <IconComponent className="w-4 h-4 shrink-0" />
                     <span>{tab.label}</span>
-                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#F5C518]" />}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          <div className="p-4 border-t border-[#E5EDF6]">
-            <div className="rounded-2xl bg-[#F8FAFC] border border-[#E5EDF6] p-3 mb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#07152F] text-[#F5C518] flex items-center justify-center text-xs font-black">
-                  {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-black truncate">{profile.name}</p>
-                  <p className="text-[9px] text-[#64748B] truncate mt-0.5">{profile.targetCourse || 'JAMB candidate'}</p>
-                </div>
+          <div className="p-4 border-t border-white/10">
+            <div className="flex items-center gap-2.5 px-1 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-[#163A70] border border-white/10 text-white flex items-center justify-center text-xs font-black shrink-0">
+                {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-black truncate text-white">{profile.name}</p>
+                <p className="text-[9px] text-white/45 truncate mt-0.5">{profile.targetCourse || 'JAMB candidate'}</p>
               </div>
             </div>
-            <button type="button" onClick={handleResetProfileSystem}
-              className="w-full min-h-[38px] rounded-xl text-[9px] uppercase tracking-wider font-black text-[#64748B] border border-[#DCE7F2] hover:border-rose-200 hover:text-rose-600 transition">
+            <button
+              type="button"
+              onClick={handleResetProfileSystem}
+              className="w-full min-h-[36px] rounded-xl text-[9px] uppercase tracking-wider font-black text-white/50 border border-white/10 hover:border-rose-300/50 hover:text-rose-200 transition"
+            >
               Exit preview
             </button>
           </div>
         </aside>
 
         <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC]">
+          {/* Contextual room header — focus rooms own their full header */}
           {!focusRoom && activeTab !== 'home' && (
-            <header className="hidden md:flex h-[68px] shrink-0 items-center justify-between px-6 bg-white border-b border-[#E5EDF6]">
-              <div>
+            <header className="hidden md:flex h-[64px] shrink-0 items-center justify-between px-6 bg-white border-b border-[#E5EDF6]">
+              <div className="min-w-0">
                 <p className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">{currentPage.title}</p>
-                <h2 className="text-sm font-black text-[#0B1220] mt-0.5">{currentPage.subtitle}</h2>
+                <h2 className="text-sm font-black text-[#0B1220] mt-0.5 truncate">{currentPage.subtitle}</h2>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="h-8 px-3 rounded-full border border-[#E5EDF6] bg-[#F8FAFC] flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518]" />
-                  <span className="text-[9px] font-black text-[#64748B]">Learning engine</span>
-                </div>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className="text-[9px] font-bold text-[#94A3B8]">SABI learning environment</span>
                 <div className="w-9 h-9 rounded-full bg-[#EAF3FF] border border-[#DCE7F2] text-[#2563EB] flex items-center justify-center text-xs font-black">
                   {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
                 </div>
               </div>
             </header>
+          )}
+
+          {/* Mobile context strip; Home renders its own richer header */}
+          {activeTab !== 'home' && (
+            <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#07152F] text-white border-b border-white/10 shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveTab('home')}
+                className="flex items-center gap-2 text-left"
+                aria-label="Go to SABI Home"
+              >
+                <span className="w-7 h-7 rounded-lg bg-white text-[#07152F] flex items-center justify-center font-black text-sm">S</span>
+                <span className="text-sm font-black">SABI</span>
+              </button>
+              <span className="text-[9px] uppercase tracking-[0.16em] font-black text-white/55">
+                {focusRoom ? 'Focus Mode' : currentPage.title}
+              </span>
+            </div>
           )}
 
           <div className={`flex-1 ${
@@ -1965,19 +2016,25 @@ export default function App() {
             {activeTab === 'mobile' && renderMobileTab()}
           </div>
 
+          {/* Intentional mobile navigation: only the five highest-frequency rooms */}
           <div className={`md:hidden fixed bottom-0 left-0 right-0 h-[68px] border-t z-50 flex justify-around items-center pb-1 px-2 backdrop-blur-xl ${
             theme === 'dark' ? 'bg-[#07152F]/95 border-white/10 text-white' : 'bg-white/95 border-[#DCE7F2] text-[#0B1220]'
           }`}>
-            {tabsList.filter(tab => ['home','practice','blitz','cbt','profile'].includes(tab.id)).map(tab => {
+            {tabsList.filter(tab => ['home', 'practice', 'blitz', 'cbt', 'profile'].includes(tab.id)).map(tab => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button key={tab.id} type="button" onClick={tab.action}
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={tab.action}
+                  aria-current={isActive ? 'page' : undefined}
                   className={`min-w-[52px] min-h-[52px] flex flex-col items-center justify-center gap-1 rounded-2xl text-[9px] font-black transition active:scale-95 ${
                     isActive
                       ? (theme === 'dark' ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]')
                       : (theme === 'dark' ? 'text-white/55' : 'text-[#64748B]')
-                  }`}>
+                  }`}
+                >
                   <IconComponent className="h-4 w-4" />
                   <span>{tab.label}</span>
                 </button>
