@@ -2977,79 +2977,121 @@ export default function App() {
     if (practiceComplete) {
       const accuracy = practiceQuestions.length ? Math.round((practiceCorrectCount / practiceQuestions.length) * 100) : 0;
       const selectedLabel = customPracticeSessionLabel();
+      const resultTone = accuracy >= 70 ? 'strong' : accuracy >= 50 ? 'building' : 'keep-going';
+      const resultMessage = resultTone === 'strong'
+        ? 'You handled this session well. Keep the same focus going.'
+        : resultTone === 'building'
+          ? 'You are building the pattern. Review what missed, then try again.'
+          : 'This is useful information. Your next session should target the gaps you just exposed.';
+
       return (
-        <div className="max-w-4xl mx-auto w-full animate-fade-in space-y-4">
-          <section className="relative overflow-hidden rounded-3xl bg-[#0A1128] text-white p-6 md:p-8">
-            <div className="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-[#4A90D9]/20" />
-            <div className="absolute right-16 -bottom-20 w-36 h-36 rounded-full bg-[#F5C518]/10" />
-            <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-5">
-              <div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Session complete</span>
-                <h3 className="text-2xl md:text-3xl font-black mt-2">Practice review finished.</h3>
-                <p className="text-sm text-white/65 mt-2 max-w-xl">Your answers have been reviewed in this frontend preview. Production mastery and learning progress remain backend-owned.</p>
+        <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+          <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+            <header className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }}
+                className="w-10 h-10 rounded-full border border-[#DCE7F2] bg-white flex items-center justify-center text-[#0B1220] shadow-sm active:scale-95"
+                aria-label="Back to Practice"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <div className="text-center">
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Session complete</span>
+                <span className="block text-[10px] text-[#64748B] mt-1">{selectedLabel}</span>
               </div>
-              <div className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 min-w-[190px]">
-                <span className="text-[9px] uppercase tracking-wider font-black text-white/45">Session</span>
-                <p className="text-xs font-black mt-1">{selectedLabel}</p>
-              </div>
-            </div>
-          </section>
+              <div className="w-10 h-10" />
+            </header>
 
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Questions reviewed</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{practiceQuestions.length}</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Correct in preview</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{practiceCorrectCount}</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Preview accuracy</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{accuracy}%</p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-[1fr_300px] gap-4">
-            <section className="sabi-surface p-5 md:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <span className="text-[9px] uppercase tracking-wider font-black text-[#4A90D9]">Review summary</span>
-                  <h4 className="text-lg font-black text-[#0A1128] mt-1">What you just practised</h4>
+            <section className="relative overflow-hidden rounded-[28px] bg-[#07152F] text-white p-6 md:p-7">
+              <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" />
+              <div className="absolute -left-12 -bottom-16 w-36 h-36 rounded-full bg-[#F5C518]/10" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Review complete
+                    </span>
+                    <h1 className="text-[30px] leading-[1.05] tracking-[-0.04em] font-black mt-3">
+                      {accuracy}%<span className="text-white/35">.</span>
+                    </h1>
+                    <p className="text-sm leading-relaxed text-white/65 mt-2 max-w-sm">{resultMessage}</p>
+                  </div>
+                  <div className="shrink-0 w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.07] flex items-center justify-center">
+                    <span className="text-lg font-black font-mono">{practiceCorrectCount}/{practiceQuestions.length}</span>
+                  </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">Local preview</span>
+
+                <div className="mt-6 h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full rounded-full bg-[#F5C518] transition-all" style={{ width: Math.min(100, accuracy) + '%' }} />
+                </div>
+                <div className="flex items-center justify-between mt-2 text-[9px] uppercase tracking-wider font-black text-white/40">
+                  <span>{practiceCorrectCount} correct</span>
+                  <span>{practiceQuestions.length - practiceCorrectCount} to review</span>
+                </div>
               </div>
-              <div className="space-y-2 mt-5">
+            </section>
+
+            <section className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-white border border-[#DCE7F2] p-4">
+                <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">Questions</span>
+                <p className="text-2xl font-black font-mono mt-1">{practiceQuestions.length}</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-[#DCE7F2] p-4">
+                <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">Correct</span>
+                <p className="text-2xl font-black font-mono mt-1">{practiceCorrectCount}</p>
+              </div>
+            </section>
+
+            <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+              <div className="px-5 pt-5 pb-3">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Session review</span>
+                <h2 className="text-lg font-black mt-1 tracking-[-0.02em]">What you just worked on</h2>
+              </div>
+              <div className="divide-y divide-[#EEF3F8]">
                 {practiceQuestions.map((q, idx) => (
-                  <div key={q.id} className="rounded-2xl border border-slate-200 bg-white p-3.5 flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center text-[10px] font-black text-[#0A1128] shrink-0">{idx + 1}</span>
+                  <div key={q.id} className="px-5 py-3.5 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[10px] font-black text-[#0B1220] shrink-0">{idx + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-black text-[#0A1128] truncate">{q.topic}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{q.subject} • {q.year} • {q.difficulty}</p>
+                      <p className="text-xs font-black truncate">{q.topic}</p>
+                      <p className="text-[10px] text-[#64748B] mt-0.5 truncate">{q.subject} • {q.year} • {q.difficulty}</p>
                     </div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">Reviewed</span>
+                    <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8] shrink-0">Reviewed</span>
                   </div>
                 ))}
               </div>
             </section>
 
-            <aside className="space-y-3">
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-700" />
-                  <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Backend boundary</span>
+            <section className="rounded-[24px] border border-[#DCE7F2] bg-[#F4F8FD] p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE7F2] flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-4 h-4 text-[#64748B]" />
                 </div>
-                <p className="text-xs text-amber-800 mt-2 leading-relaxed">This preview does not update mastery, XP, readiness, recommendations, streaks or JAMB score.</p>
-              </div>
-              <div className="sabi-surface p-5">
-                <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next step</span>
-                <h4 className="text-sm font-black text-[#0A1128] mt-1">Keep the momentum going.</h4>
-                <div className="space-y-2 mt-4">
-                  <button onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }} className="w-full py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-[10px] font-black uppercase tracking-wider">Practice Again</button>
-                  <button onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('progress'); }} className="w-full py-3 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] text-[10px] font-black uppercase tracking-wider">View Progress</button>
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-[#64748B]">Learning data</span>
+                  <p className="text-xs leading-relaxed text-[#64748B] mt-1">
+                    This frontend preview does not write mastery, readiness, recommendations, streaks, XP or JAMB score. Those values stay backend-owned.
+                  </p>
                 </div>
               </div>
-            </aside>
+            </section>
+
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }}
+                className="w-full min-h-[52px] rounded-2xl bg-[#2563EB] text-white text-sm font-black shadow-sm active:scale-[0.99] transition"
+              >
+                Practice again
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('progress'); }}
+                className="w-full min-h-[50px] rounded-2xl border border-[#DCE7F2] bg-white text-[#0B1220] text-sm font-black active:scale-[0.99] transition"
+              >
+                View progress
+              </button>
+            </div>
           </div>
         </div>
       );
