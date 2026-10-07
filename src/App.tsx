@@ -2437,105 +2437,91 @@ export default function App() {
 
   function renderRecommendationsTab() {
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden shadow-sm">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10">
-                  <Sparkles className="w-3.5 h-3.5 text-[#F5C518]" />
-                  <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/70">Learning intelligence</span>
-                </div>
-                <h2 className="text-2xl md:text-4xl font-black tracking-tight mt-4">Your next best action.</h2>
-                <p className="text-sm md:text-base text-white/60 mt-3 leading-relaxed max-w-xl">
-                  SABI turns your learning evidence into a focused recommendation. The learning engine decides what matters next — the frontend only presents it.
-                </p>
-              </div>
-              <div className="w-full sm:w-auto rounded-2xl bg-white/5 border border-white/10 p-4 min-w-[180px]">
-                <span className="text-[9px] uppercase tracking-widest font-black text-white/40">Recommendation status</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="w-2 h-2 rounded-full bg-[#F5C518]" />
-                  <span className="text-sm font-black">Sync pending</span>
-                </div>
-                <p className="text-[10px] text-white/45 mt-1">Backend data required</p>
-              </div>
-            </div>
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="rounded-[28px] bg-[#07152F] text-white p-5 md:p-8 overflow-hidden relative">
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#2563EB]/20 blur-3xl" />
+          <div className="relative max-w-3xl">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Next Move</span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight mt-2">Know what to do next.</h2>
+            <p className="text-sm md:text-base text-white/60 mt-3 max-w-2xl leading-relaxed">
+              SABI is designed to turn your learning evidence into one focused next step — not a wall of recommendations.
+            </p>
           </div>
         </section>
 
-        <section className="grid lg:grid-cols-[1.35fr_.65fr] gap-5">
-          <div className="sabi-surface p-5 md:p-6">
+        <section className="grid lg:grid-cols-[1.35fr_.65fr] gap-4">
+          <div className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Current recommendation</span>
-                <h3 className="text-xl font-black text-[#0A1128] mt-1">Waiting for your learning signal</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Recommended for you</span>
+                <h3 className="text-2xl font-black text-[#0B1220] mt-2">Your next best action is loading.</h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-xl">
+                  The learning engine will choose the action, target, reason and priority from your real learning state.
+                </p>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-[#F8FAFC] border border-[#D6E4F0] flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-[#4A90D9]" />
+              <div className="hidden sm:flex h-11 w-11 rounded-2xl bg-[#EBF4FF] border border-[#D6E4F0] items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-[#2563EB]" />
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-dashed border-[#D6E4F0] bg-[#F8FBFF] p-5">
+            <div className="mt-6 rounded-[20px] bg-[#F8FAFC] border border-slate-200 p-4">
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  ['Action', 'Backend supplied'],
-                  ['Target', 'Backend supplied'],
-                  ['Reason', 'Backend supplied'],
-                  ['Priority', 'Backend supplied'],
-                  ['Duration', 'Backend supplied'],
-                  ['Source', 'Learning engine']
+                  ['What', 'Waiting for backend'],
+                  ['Where', 'Waiting for backend'],
+                  ['Why', 'Waiting for backend'],
+                  ['Priority', 'Waiting for backend']
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl bg-white border border-[#D6E4F0] p-3">
-                    <span className="text-[8px] uppercase tracking-widest font-black text-slate-400">{label}</span>
-                    <p className="text-xs font-black text-slate-500 mt-1">{value}</p>
+                  <div key={label} className="rounded-2xl bg-white border border-slate-200 p-4">
+                    <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-slate-400">{label}</span>
+                    <span className="block text-xs font-black text-slate-500 mt-1">{value}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-slate-500 mt-4 leading-relaxed">
-                No recommendation is fabricated while the service is unavailable. Once the backend returns one, this same surface can become the student's single clear next step.
-              </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 mt-5">
-              <button type="button" onClick={() => setActiveTab('practice')} className="flex-1 px-5 py-3 rounded-xl bg-[#0A1128] text-[#F5C518] font-black text-xs uppercase tracking-wider">
+            <div className="mt-5 flex flex-col sm:flex-row gap-2">
+              <button type="button" onClick={() => setActiveTab('practice')} className="min-h-[50px] flex-1 rounded-2xl bg-[#0B1220] text-white text-[10px] font-black uppercase tracking-wider hover:bg-[#16213A] transition-colors">
                 Open Practice
               </button>
-              <button type="button" onClick={() => setActiveTab('progress')} className="px-5 py-3 rounded-xl border border-[#D6E4F0] text-[#0A1128] font-black text-xs uppercase tracking-wider">
+              <button type="button" onClick={() => setActiveTab('progress')} className="min-h-[50px] px-5 rounded-2xl border border-slate-200 text-[#0B1220] text-[10px] font-black uppercase tracking-wider">
                 Review Progress
               </button>
             </div>
           </div>
 
-          <aside className="space-y-5">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">How it works</span>
-              <div className="mt-4 space-y-4">
-                {[
-                  ['01', 'Learning evidence', 'Questions, attempts and other approved signals are captured.'],
-                  ['02', 'Recommendation engine', 'The backend evaluates those signals against the learning model.'],
-                  ['03', 'Focused action', 'SABI presents one useful next step without recalculating it in the browser.']
-                ].map(([num, title, body]) => (
-                  <div key={num} className="flex gap-3">
-                    <span className="shrink-0 h-8 w-8 rounded-lg bg-[#0A1128] text-[#F5C518] flex items-center justify-center text-[9px] font-black">{num}</span>
-                    <div>
-                      <h4 className="text-xs font-black text-[#0A1128]">{title}</h4>
-                      <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">{body}</p>
-                    </div>
+          <aside className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-6">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">The intelligence loop</span>
+            <div className="mt-5 space-y-5">
+              {[
+                ['01', 'You learn', 'Practice, diagnostic and exam activity create learning evidence.'],
+                ['02', 'SABI learns', 'The backend evaluates your evidence against the learning model.'],
+                ['03', 'You continue', 'SABI presents one useful action instead of making you choose from noise.']
+              ].map(([num, title, body]) => (
+                <div key={num} className="flex gap-3">
+                  <span className="h-8 w-8 rounded-xl bg-[#07152F] text-[#F5C518] flex items-center justify-center text-[9px] font-black shrink-0">{num}</span>
+                  <div>
+                    <h4 className="text-xs font-black text-[#0B1220]">{title}</h4>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mt-1">{body}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[#D6E4F0] bg-white p-5">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-[#4A90D9]" />
-                <span className="text-[9px] uppercase tracking-widest font-black text-[#0A1128]">Backend boundary</span>
-              </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed mt-3">
-                Recommendation priority, target, reason, timing and eligibility are authoritative backend state. The frontend does not invent or rank them.
-              </p>
+                </div>
+              ))}
             </div>
           </aside>
+        </section>
+
+        <section className="rounded-[22px] border border-slate-200 bg-[#F8FAFC] p-5">
+          <div className="flex items-start gap-3">
+            <div className="h-9 w-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-4 h-4 text-[#2563EB]" />
+            </div>
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Backend boundary</span>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Recommendation target, priority, reason, timing and eligibility are authoritative server state. This screen will display those values when the learning engine supplies them; it does not fabricate or rank them.
+              </p>
+            </div>
+          </div>
         </section>
       </div>
     );
