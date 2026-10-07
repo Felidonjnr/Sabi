@@ -150,6 +150,13 @@ export default function App() {
 
   // Home Dashboard States & Tabs
   const [activeTab, setActiveTab] = useState<'home' | 'practice' | 'blitz' | 'cbt' | 'progress' | 'recommendations' | 'mastery' | 'leaderboard' | 'profile' | 'settings' | 'aitutor' | 'mobile'>('home');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    try { return localStorage.getItem('sabi-theme') === 'dark' ? 'dark' : 'light'; } catch { return 'light'; }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('sabi-theme', theme); } catch {}
+  }, [theme]);
   const [selectedSubjectPractice, setSelectedSubjectPractice] = useState<SubjectName>('English Language');
   const [activeSessionTopicPractice, setActiveSessionTopicPractice] = useState<string>('');
   const [practiceSessionType, setPracticeSessionType] = useState<'smart' | 'custom' | null>(null);
@@ -1826,143 +1833,124 @@ export default function App() {
     if (!profile) return null;
 
     const tabsList = [
-      { id: 'home', label: 'Home', icon: Home, action: () => { setActiveTab('home'); } },
+      { id: 'home', label: 'Home', icon: Home, action: () => setActiveTab('home') },
       { id: 'practice', label: 'Practice', icon: Play, action: () => { setActiveTab('practice'); setPracticeSessionType(null); } },
-      { id: 'blitz', label: 'Blitz', icon: Zap, action: () => { setActiveTab('blitz'); } },
-      { id: 'cbt', label: 'CBT', icon: FileText, action: () => { setActiveTab('cbt'); } },
-      { id: 'progress', label: 'Progress', icon: ArrowUpRight, action: () => { setActiveTab('progress'); } },
-      { id: 'profile', label: 'Profile', icon: User, action: () => { setActiveTab('profile'); } },
-      { id: 'settings', label: 'Settings', icon: Settings, action: () => { setActiveTab('settings'); } },
+      { id: 'blitz', label: 'Blitz', icon: Zap, action: () => setActiveTab('blitz') },
+      { id: 'cbt', label: 'CBT', icon: FileText, action: () => setActiveTab('cbt') },
+      { id: 'progress', label: 'Progress', icon: ArrowUpRight, action: () => setActiveTab('progress') },
+      { id: 'profile', label: 'Profile', icon: User, action: () => setActiveTab('profile') },
+      { id: 'settings', label: 'Settings', icon: Settings, action: () => setActiveTab('settings') },
     ];
 
+    const focusRoom = activeTab === 'blitz' || activeTab === 'cbt' || activeTab === 'aitutor' || (activeTab === 'practice' && practiceSessionType !== null);
+
+    const pageNames: Record<string, { title: string; subtitle: string }> = {
+      practice: { title: practiceSessionType === 'smart' ? 'Smart Practice' : practiceSessionType === 'custom' ? 'Custom Practice' : 'Practice', subtitle: 'Choose how you want to work.' },
+      progress: { title: 'Progress Room', subtitle: 'See the learning evidence SABI has collected.' },
+      recommendations: { title: 'Next Move', subtitle: 'Know what to do next.' },
+      mastery: { title: 'Learning Evidence', subtitle: 'Explore your learning map.' },
+      leaderboard: { title: 'Leaderboard', subtitle: 'Community data will appear when the service is connected.' },
+      profile: { title: 'Profile', subtitle: 'Your learning context and JAMB goals.' },
+      settings: { title: 'Settings', subtitle: 'Make SABI work for you.' },
+      mobile: { title: 'Mobile Prototype', subtitle: 'Inspect the native experience.' },
+    };
+
+    const currentPage = pageNames[activeTab] || { title: 'SABI', subtitle: '' };
+
     return (
-      <div className="flex-1 flex flex-col md:flex-row bg-[#F4F7FB] text-slate-800 animate-fade-in shrink-0 relative min-h-[600px] rounded-2xl overflow-hidden border border-[#D6E4F0] shadow-sm">
-        
-        {/* Left Sidebar for Desktop Web */}
-        <aside className="hidden md:flex md:w-64 bg-[#0A1128] text-white flex-col justify-between shrink-0 p-6 border-r border-[#D6E4F0]/10 z-30">
-          <div className="space-y-6">
-            {/* User Profile Badge */}
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#F5C518] to-yellow-300 text-[#0A1128] flex items-center justify-center font-black text-sm uppercase shadow shrink-0">
-                  {profile.name.trim() ? profile.name.trim()[0] : '?'}
-                </div>
-                <div className="truncate">
-                  <h4 className="text-xs font-black truncate text-white">{profile.name}</h4>
-                  <p className="text-[9px] text-sky-200/80 uppercase font-mono tracking-wider">{profile.classLevel}</p>
-                </div>
-              </div>
-              <div className="border-t border-white/10 pt-2.5">
-                <p className="text-[9px] text-slate-400">Target Goal:</p>
-                <p className="text-[10px] font-bold text-[#F5C518] truncate leading-tight mt-0.5">
-                  {profile.targetCourse}
-                </p>
-                <p className="text-[9px] font-bold text-slate-300 truncate leading-tight mt-0.5">
-                  at {profile.targetUniversity}
-                </p>
-                <p className="text-[10px] font-bold text-sky-300 mt-1">Exam schedule pending sync</p>
-              </div>
-              <div className="flex justify-between items-center text-[10px] bg-white/10 px-2 py-1 rounded-lg">
-                <span className="text-slate-300">Account sync:</span>
-                <span className="font-extrabold text-[#F5C518]">Pending</span>
-              </div>
+      <div className="flex-1 flex flex-col md:flex-row bg-[#F8FAFC] text-[#0B1220] animate-fade-in shrink-0 relative min-h-[600px] overflow-hidden border border-[#DCE7F2] shadow-sm">
+        <aside className="hidden md:flex md:w-[248px] bg-white flex-col justify-between shrink-0 border-r border-[#E5EDF6] z-30">
+          <div>
+            <div className="px-5 pt-6 pb-5">
+              <button type="button" onClick={() => setActiveTab('home')} className="flex items-center gap-2.5 text-left">
+                <span className="w-9 h-9 rounded-xl bg-[#07152F] text-white flex items-center justify-center font-black text-lg">S</span>
+                <span>
+                  <span className="block text-[15px] font-black tracking-tight">SABI</span>
+                  <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-[#94A3B8] mt-0.5">JAMB learning</span>
+                </span>
+              </button>
             </div>
 
-            {/* Nav Menu */}
-            <nav className="space-y-1">
-              {tabsList.map((tab) => {
+            <nav className="px-3 space-y-1">
+              <p className="px-3 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Learn</p>
+              {tabsList.slice(0, 5).map(tab => {
+                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id && !focusRoom;
+                return (
+                  <button key={tab.id} type="button" onClick={tab.action}
+                    className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
+                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
+                    }`}>
+                    <IconComponent className="w-4 h-4 shrink-0" />
+                    <span>{tab.label}</span>
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
+                  </button>
+                );
+              })}
+
+              <p className="px-3 pt-5 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Account</p>
+              {tabsList.slice(5).map(tab => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
-                  <button
-                    key={tab.id}
-                    onClick={tab.action}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-                      isActive 
-                        ? 'bg-[#F5C518] text-[#0A1128] shadow-md border-2 border-[#0A1128]' 
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <IconComponent className="h-4 w-4 shrink-0" />
+                  <button key={tab.id} type="button" onClick={tab.action}
+                    className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
+                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
+                    }`}>
+                    <IconComponent className="w-4 h-4 shrink-0" />
                     <span>{tab.label}</span>
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Quick Exit */}
-          <div className="border-t border-white/10 pt-4">
-            <button 
-              onClick={handleResetProfileSystem} 
-              className="w-full py-2 bg-rose-950/40 border border-rose-900/50 hover:bg-rose-900/40 text-rose-300 rounded-xl text-[10px] font-bold uppercase tracking-wider transition"
-            >
-              Reset Portal
+          <div className="p-4 border-t border-[#E5EDF6]">
+            <div className="rounded-2xl bg-[#F8FAFC] border border-[#E5EDF6] p-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#07152F] text-[#F5C518] flex items-center justify-center text-xs font-black">
+                  {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black truncate">{profile.name}</p>
+                  <p className="text-[9px] text-[#64748B] truncate mt-0.5">{profile.targetCourse || 'JAMB candidate'}</p>
+                </div>
+              </div>
+            </div>
+            <button type="button" onClick={handleResetProfileSystem}
+              className="w-full min-h-[38px] rounded-xl text-[9px] uppercase tracking-wider font-black text-[#64748B] border border-[#DCE7F2] hover:border-rose-200 hover:text-rose-600 transition">
+              Exit preview
             </button>
           </div>
         </aside>
 
-        {/* Main Content Pane */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#F4F7FB]">
-          
-          {/* Header row for Mobile view / Status display for Web */}
-          <header className={`bg-gradient-to-r from-[#0A1128] to-[#4A90D9] p-4 text-white shadow-sm shrink-0 md:bg-white md:text-slate-850 md:from-white md:to-white md:border-b md:border-[#D6E4F0] ${activeTab === 'practice' ? 'flex justify-center md:justify-start' : 'flex justify-between items-center'}`}>
-            {activeTab === 'practice' ? (
-              <h1 className="text-sm md:text-base font-black uppercase tracking-widest text-[#F5C518] md:text-[#0A1128]">
-                {practiceSessionType === null 
-                  ? "Practice Portal" 
-                  : practiceSessionType === 'smart' 
-                    ? "Smart Practice: Adaptive Mix" 
-                    : `Custom Practice: ${customPracticeSubject}`}
-              </h1>
-            ) : activeTab === 'home' ? (
-              <>
-                <div className="flex items-center gap-2.5 md:hidden">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C518] to-yellow-300 text-[#0A1128] flex items-center justify-center font-black text-sm shadow">
-                    {profile.name[0]}
-                  </div>
-                  <div className="truncate flex flex-col justify-center">
-                    <h4 className="text-xs font-extrabold truncate max-w-[120px] text-white">{profile.name}</h4>
-                    <p className="text-[8px] text-sky-100/95 leading-none mt-1">Goal: {profile.targetCourse}</p>
-                    <p className="text-[8px] font-bold text-sky-300 mt-1">Exam schedule pending</p>
-                  </div>
-                </div>
-
-                {/* Desktop status row */}
-                <div className="hidden md:flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-500">Active Workspace:</span>
-                  <span className="text-xs font-extrabold text-[#0A1128] bg-[#EBF1FA] px-3 py-1 rounded-full border border-[#D0E1F9] uppercase tracking-wide">
-                    Home Dashboard
-                  </span>
-                  <div className="h-4 w-px bg-slate-200" />
-                  <span className="text-xs text-slate-500">Exam schedule:</span>
-                  <span className="text-xs font-black text-[#4A90D9]">Awaiting backend sync</span>
-                </div>
-
-                {/* Right Header Side Badge */}
-                <div className="flex items-center gap-2">
-                  <div className="flex md:hidden items-center gap-1 bg-white/10 px-2 py-1 rounded-full border border-white/20">
-                    <Zap className="h-3.5 w-3.5 text-[#F5C518] fill-current" />
-                    <span className="text-[10px] font-black">Account sync pending</span>
-                  </div>
-                  
-                  <div className="hidden md:flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-xl border border-yellow-200 text-[#0A1128]">
-                    <Zap className="h-4 w-4 text-[#F5C518] fill-current" />
-                    <span className="text-xs font-black">Account sync pending</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center">
-                <span className="text-sm md:text-base font-black uppercase tracking-widest text-[#F5C518] md:text-[#0A1128]">
-                  {activeTab === 'mastery' ? 'Learning Evidence' : activeTab === 'aitutor' ? 'AI Coach Hub' : activeTab === 'leaderboard' ? 'Standings Leaderboard' : activeTab === 'mobile' ? 'Mobile App Prototype' : activeTab === 'settings' ? 'Settings' : activeTab === 'blitz' ? 'Blitz' : activeTab === 'cbt' ? 'CBT Simulator' : activeTab === 'progress' ? 'Progress' : activeTab === 'recommendations' ? 'Recommendations' : 'Account Details'}
-                </span>
+        <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC]">
+          {!focusRoom && activeTab !== 'home' && (
+            <header className="hidden md:flex h-[68px] shrink-0 items-center justify-between px-6 bg-white border-b border-[#E5EDF6]">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">{currentPage.title}</p>
+                <h2 className="text-sm font-black text-[#0B1220] mt-0.5">{currentPage.subtitle}</h2>
               </div>
-            )}
-          </header>
+              <div className="flex items-center gap-3">
+                <div className="h-8 px-3 rounded-full border border-[#E5EDF6] bg-[#F8FAFC] flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518]" />
+                  <span className="text-[9px] font-black text-[#64748B]">Learning engine</span>
+                </div>
+                <div className="w-9 h-9 rounded-full bg-[#EAF3FF] border border-[#DCE7F2] text-[#2563EB] flex items-center justify-center text-xs font-black">
+                  {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+                </div>
+              </div>
+            </header>
+          )}
 
-          {/* Tab Content Canvas context */}
-          <div className={`flex-1 ${((activeTab === 'practice' && practiceSessionType === null) || activeTab === 'aitutor') ? 'overflow-hidden flex flex-col bg-[#F4F7FB] p-3 md:p-4 pb-4 md:pb-4' : 'overflow-y-auto p-4 md:p-6 pb-20 md:pb-6'} relative break-words`}>
+          <div className={`flex-1 ${
+            ((activeTab === 'practice' && practiceSessionType === null) || activeTab === 'aitutor')
+              ? 'overflow-hidden flex flex-col bg-[#F8FAFC] p-3 md:p-4 pb-4 md:pb-4'
+              : focusRoom
+                ? 'overflow-y-auto p-0 pb-20 md:pb-0'
+                : 'overflow-y-auto p-4 md:p-6 pb-20 md:pb-6'
+          } relative break-words`}>
             {activeTab === 'home' && renderHomeTab()}
             {activeTab === 'practice' && renderPracticeTab()}
             {activeTab === 'blitz' && renderBlitzTab()}
@@ -1976,25 +1964,26 @@ export default function App() {
             {activeTab === 'aitutor' && renderAITutorTab()}
             {activeTab === 'mobile' && renderMobileTab()}
           </div>
-          
-          {/* Bottom Mobile Tab Bar (Hidden on Desktop) */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 h-14 bg-[#0A1128] border-t border-slate-800 flex justify-around items-center z-50 shrink-0 select-none pb-1.5 px-2 text-white shadow-lg">
-            {tabsList.map((tab) => {
+
+          <div className={`md:hidden fixed bottom-0 left-0 right-0 h-[68px] border-t z-50 flex justify-around items-center pb-1 px-2 backdrop-blur-xl ${
+            theme === 'dark' ? 'bg-[#07152F]/95 border-white/10 text-white' : 'bg-white/95 border-[#DCE7F2] text-[#0B1220]'
+          }`}>
+            {tabsList.filter(tab => ['home','practice','blitz','cbt','profile'].includes(tab.id)).map(tab => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
-                  key={tab.id}
-                  onClick={tab.action}
-                  className={`flex flex-col items-center gap-0.5 text-[9px] font-bold ${isActive ? 'text-[#F5C518]' : 'text-[#9AACBF]/85'}`}
-                >
-                  <IconComponent className="h-4.5 w-4.5" />
+                <button key={tab.id} type="button" onClick={tab.action}
+                  className={`min-w-[52px] min-h-[52px] flex flex-col items-center justify-center gap-1 rounded-2xl text-[9px] font-black transition active:scale-95 ${
+                    isActive
+                      ? (theme === 'dark' ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]')
+                      : (theme === 'dark' ? 'text-white/55' : 'text-[#64748B]')
+                  }`}>
+                  <IconComponent className="h-4 w-4" />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
-
         </div>
       </div>
     );
@@ -2004,194 +1993,192 @@ export default function App() {
   function renderHomeTab() {
     if (!profile) return null;
 
+    const dark = theme === 'dark';
+    const page = dark ? 'bg-[#07152F] text-white' : 'bg-[#F8FAFC] text-[#0B1220]';
+    const muted = dark ? 'text-slate-300/75' : 'text-[#64748B]';
+    const surface = dark ? 'bg-[#0B1E3D] border-white/10' : 'bg-white border-[#DCE7F2]';
+    const subtle = dark ? 'bg-white/[0.045] border-white/10' : 'bg-[#F8FBFF] border-[#E3EDF7]';
+    const heading = dark ? 'text-white' : 'text-[#0B1220]';
+
     return (
-      <div className="space-y-4 animate-fade-in font-sans">
-        {/* Learning-state hero: never present client calculations as authoritative */}
-        <div className="sabi-surface p-5 md:p-6 relative overflow-hidden">
-          <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-[#4A90D9]/5 pointer-events-none" />
-          <div className="relative">
-            <span className="text-[9px] uppercase font-black tracking-widest text-[#4A90D9]">Today's learning state</span>
-            <h2 className="text-2xl md:text-3xl font-black text-[#0A1128] mt-1">What should I do now?</h2>
-            <p className="text-sm text-slate-500 mt-2 max-w-2xl">SABI keeps the measurement and recommendation logic behind the interface. This dashboard presents the state supplied by the learning engine.</p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              <button onClick={() => setActiveTab('practice')} className="px-4 py-2.5 rounded-xl bg-[#F5C518] text-[#0A1128] font-black text-xs uppercase tracking-wider">Practice</button>
-              <button onClick={() => setActiveTab('blitz')} className="px-4 py-2.5 rounded-xl bg-[#0A1128] text-white font-black text-xs uppercase tracking-wider">Blitz</button>
-              <button onClick={() => setActiveTab('cbt')} className="px-4 py-2.5 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-xs uppercase tracking-wider">CBT</button>
-              <button onClick={() => setActiveTab('recommendations')} className="px-4 py-2.5 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-xs uppercase tracking-wider">Focus area</button>
+      <div className={`min-h-full ${page} animate-fade-in`}>
+        <div className="max-w-xl mx-auto px-4 pt-3 pb-24">
+          <header className="flex items-center justify-between py-2 mb-5">
+            <div className="flex items-center gap-2">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg ${dark ? 'bg-white text-[#07152F]' : 'bg-[#2563EB] text-white'}`}>S</div>
+              <span className={`text-lg font-black tracking-tight ${heading}`}>SABI</span>
             </div>
-          </div>
-        </div>
-
-        {/* Activity summary: do not fabricate streak values before the learning API is connected */}
-        <div className="sabi-surface p-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Award className="h-5 w-5 text-[#4A90D9] shrink-0" />
-            <div>
-              <p className="text-xs font-black text-[#0A1128]">Study activity</p>
-              <p className="text-[10px] text-slate-500 mt-0.5">Your streak, XP and activity history will appear here from the learning engine.</p>
+            <div className="flex items-center gap-2">
+              <button type="button" aria-label="Switch theme" onClick={() => setTheme(dark ? 'light' : 'dark')}
+                className={`w-10 h-10 rounded-full border flex items-center justify-center transition active:scale-95 ${subtle} ${heading}`}>
+                {dark ? '☀' : '☾'}
+              </button>
+              <button type="button" aria-label="Notifications" className={`w-10 h-10 rounded-full border flex items-center justify-center ${subtle} ${heading}`}>
+                <span className="relative text-base">♧<span className="absolute -right-1 -top-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border-2 border-current"></span></span>
+              </button>
+              <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-black text-sm ${dark ? 'bg-[#163A70] border-[#2E6FE8] text-white' : 'bg-[#EAF3FF] border-white text-[#2563EB]'}`}>
+                {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+              </div>
             </div>
-          </div>
-          <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black uppercase text-slate-400 shrink-0">Sync pending</span>
-        </div>
+          </header>
 
-        {/* Subject progress modules */}
-        <div className="space-y-2">
-          <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider">Subject learning evidence:</span>
-          <div className="grid grid-cols-1 gap-2">
-            {profile.chosenSubjects.map((subName) => {
-              const observedEvidence = (Object.values(masteryMap) as MasteryMapItem[])
-                .filter(t => t.subject === subName)
-                .reduce((sum, item) => sum + item.attempts, 0);
-              const selfReportedConfidence = profile.subjectConfidence[subName];
+          <section className="mb-6">
+            <p className={`text-sm font-semibold ${muted}`}>Good morning, {profile.name.split(' ')[0] || 'there'}.</p>
+            <h1 className={`text-[30px] leading-[1.08] font-black tracking-[-0.04em] mt-1 ${heading}`}>Let’s move your JAMB preparation forward.</h1>
+          </section>
 
-              return (
-                <div
-                  key={subName}
-                  onClick={() => {
-                    setMapSubject(subName);
-                    setActiveTab('mastery');
-                  }}
-                  className="bg-white border border-[#D6E4F0] p-3 rounded-xl flex justify-between items-center cursor-pointer hover:border-[#4A90D9] transition shadow-sm"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-lg bg-slate-50 text-[#0A1128] border border-slate-100">
-                      <BookOpen className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-[#0A1128] truncate max-w-[170px]">{subName}</p>
-                      <p className="text-[9px] text-slate-400 mt-0.5">{observedEvidence} observed question{observedEvidence === 1 ? '' : 's'} • self-report confidence {selfReportedConfidence}/5</p>
-                    </div>
+          <section className={`rounded-[24px] border overflow-hidden relative ${dark ? 'bg-[#0A2B62] border-[#2563EB]/70' : 'bg-[#0A2B62] border-[#2563EB]'} text-white p-5 shadow-sm`}>
+            <div className="absolute -right-8 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35"></div>
+            <div className="relative">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[10px] font-black tracking-[0.16em] text-[#BFD7FF] uppercase">Your next move</span>
+                <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-[9px] font-bold">Learning engine</span>
+              </div>
+              <p className="text-xs font-bold text-[#CFE0FF]">Chemistry</p>
+              <h2 className="text-[25px] leading-tight font-black mt-1">Atomic Structure</h2>
+              <div className="flex gap-4 mt-4 text-[11px] text-white/75">
+                <span>10 questions</span><span>≈ 15 mins</span>
+              </div>
+              <button type="button" onClick={() => { setActiveTab('practice'); setPracticeSessionType('smart'); }}
+                className="w-full mt-5 h-12 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm flex items-center justify-center gap-2 active:scale-[.98] transition">
+                Continue practice <span className="text-lg">→</span>
+              </button>
+            </div>
+          </section>
+
+          <section className="mt-7">
+            <div className="flex items-end justify-between mb-3">
+              <div><p className={`text-[10px] uppercase tracking-[0.16em] font-black ${muted}`}>Your learning space</p><h2 className={`text-xl font-black mt-1 ${heading}`}>Choose how you want to learn.</h2></div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                ['Practice','Sharpen your understanding.','✣','practice'],
+                ['Smart Practice','Focus on what matters.','◎','practice'],
+                ['Blitz','Quick practice to keep momentum.','ϟ','blitz'],
+                ['CBT','Simulate the real JAMB experience.','▣','cbt']
+              ].map(([title,desc,icon,target]) => (
+                <button key={title} type="button" onClick={() => { setActiveTab(target as any); if(target==='practice') setPracticeSessionType(title==='Smart Practice'?'smart':null); }}
+                  className={`min-h-[142px] rounded-[20px] border p-4 text-left transition active:scale-[.98] ${surface}`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl font-black mb-4 ${title==='Blitz' ? 'bg-[#FFF4C7] text-[#8A6900]' : dark ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]'}`}>{icon}</div>
+                  <h3 className={`text-sm font-black ${heading}`}>{title}</h3>
+                  <p className={`text-[10px] leading-relaxed mt-1 ${muted}`}>{desc}</p>
+                  <span className="block mt-3 text-xs font-black text-[#2563EB]">Open →</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className={`mt-7 rounded-[22px] border p-4 ${surface}`}>
+            <div className="flex items-center justify-between">
+              <div><p className={`text-[10px] uppercase tracking-[0.16em] font-black ${muted}`}>Learning evidence</p><h2 className={`text-lg font-black mt-1 ${heading}`}>Your progress</h2></div>
+              <button type="button" onClick={() => setActiveTab('progress')} className="text-xs font-black text-[#2563EB]">See details</button>
+            </div>
+            <div className="flex items-center gap-5 mt-5">
+              <div className={`w-28 h-28 rounded-full border-[10px] flex items-center justify-center shrink-0 ${dark ? 'border-[#163A70]' : 'border-[#E7EEF7]'}`}>
+                <div className="text-center"><span className={`block text-2xl font-black ${heading}`}>—</span><span className={`block text-[8px] font-bold ${muted}`}>backend state</span></div>
+              </div>
+              <div className="flex-1 space-y-3">
+                {(profile.chosenSubjects || []).slice(0,4).map(subject => (
+                  <div key={subject}>
+                    <div className="flex justify-between text-[10px] font-bold"><span className={heading}>{subject}</span><span className={muted}>Evidence pending</span></div>
+                    <div className={`h-1.5 rounded-full mt-1 overflow-hidden ${dark ? 'bg-white/10' : 'bg-[#E7EEF7]'}`}><div className="h-full w-1/4 bg-[#2563EB] rounded-full opacity-70"></div></div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </div>
-              );
-            })}
-          </div>
-        </div>
+                ))}
+              </div>
+            </div>
+            <p className={`text-[10px] leading-relaxed mt-4 ${muted}`}>SABI will show authoritative mastery and readiness here when the learning engine syncs.</p>
+          </section>
 
-        {/* Recommendation surface: backend-owned */}
-        <div className="bg-[#0A1128] border-2 border-[#0A1128] rounded-2xl p-5 text-white relative overflow-hidden shadow-lg">
-          <div className="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-white/10" />
-          <span className="text-[8px] bg-[#F5C518] text-[#0A1128] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">Learning engine</span>
-          <h3 className="text-base font-black mt-3">Your next study action</h3>
-          <p className="text-[11px] text-sky-100 leading-relaxed mt-1.5">
-            SABI will show the next recommended subject, topic, reason and duration here when recommendation data is available.
-          </p>
-          <div className="grid sm:grid-cols-2 gap-2 mt-4">
-            <button
-              onClick={() => setActiveTab('recommendations')}
-              className="w-full py-2.5 bg-[#F5C518] text-[#0A1128] font-black text-[10px] uppercase tracking-wider rounded-xl hover:bg-yellow-400 transition"
-            >
-              View recommendations
-            </button>
-            <button
-              onClick={() => { setActiveTab('practice'); setPracticeSessionType(null); }}
-              className="w-full py-2.5 bg-transparent border-2 border-white/20 text-sky-100 font-black text-[10px] uppercase tracking-wider rounded-xl hover:bg-white/5 transition"
-            >
-              Practice on your own
-            </button>
-          </div>
+          <section className="mt-7">
+            <div className="flex items-center justify-between mb-3"><h2 className={`text-lg font-black ${heading}`}>Recent activity</h2><button type="button" onClick={() => setActiveTab('progress')} className="text-xs font-black text-[#2563EB]">See all</button></div>
+            <div className="space-y-2">
+              <div className={`rounded-2xl border p-4 flex items-center gap-3 ${subtle}`}><div className="w-9 h-9 rounded-xl bg-[#EAF3FF] text-[#2563EB] flex items-center justify-center">↗</div><div className="min-w-0 flex-1"><p className={`text-xs font-black ${heading}`}>Your learning history</p><p className={`text-[10px] mt-0.5 ${muted}`}>Activity will appear here from the learning engine.</p></div><span className={`text-[9px] font-bold ${muted}`}>Pending</span></div>
+            </div>
+          </section>
+
+          <section className="mt-7">
+            <div className="flex items-center justify-between mb-3"><h2 className={`text-lg font-black ${heading}`}>Recommended for you</h2><button type="button" onClick={() => setActiveTab('recommendations')} className="text-xs font-black text-[#2563EB]">See all</button></div>
+            <div className={`rounded-2xl border border-dashed p-5 ${dark ? 'border-white/15 bg-white/[0.03]' : 'border-[#C9D8E8] bg-white'}`}>
+              <p className={`text-xs font-black ${heading}`}>Personalized recommendations are coming from SABI’s learning engine.</p>
+              <button type="button" onClick={() => setActiveTab('recommendations')} className="mt-3 text-xs font-black text-[#2563EB]">View recommendations →</button>
+            </div>
+          </section>
         </div>
       </div>
     );
   }
 
-  // --- SUB-PANE: BLITZ / PROGRESS / CBT / RECOMMENDATIONS ---
   function renderBlitzTab() {
     const blitzQuestion = practiceQuestions[0] || SEED_QUESTIONS.find(q => profile?.chosenSubjects.includes(q.subject)) || SEED_QUESTIONS[0];
     const hasAnswer = practiceSelectedAnswer !== null;
     const isCorrect = hasAnswer && practiceSelectedAnswer === blitzQuestion.answer;
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        {/* Blitz hero */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0A1128] text-white p-5 md:p-7 shadow-lg">
-          <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-20 h-36 w-36 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+      <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
+        <div className="max-w-xl mx-auto px-4 pt-5">
+          <header className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-xl bg-[#F5C518] text-[#0A1128]">
-                  <Zap className="h-4 w-4" />
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Blitz</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-black mt-3 tracking-tight">Fast practice. One question at a time.</h2>
-              <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                Blitz is a focused rapid-practice mode. The learning engine will control question selection, session state and scoring when connected.
-              </p>
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Blitz</span>
+              <h1 className="text-[28px] leading-tight tracking-[-0.04em] font-black mt-1">Think fast.</h1>
             </div>
-            <div className="grid grid-cols-2 gap-2 md:min-w-[250px]">
-              <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
-                <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-400">Mode</span>
-                <span className="block text-sm font-black mt-1">Rapid practice</span>
-              </div>
-              <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
-                <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-400">State</span>
-                <span className="block text-sm font-black mt-1">Preview</span>
-              </div>
+            <div className="w-10 h-10 rounded-2xl bg-white/[0.07] border border-white/10 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[#F5C518]" />
             </div>
-          </div>
-        </div>
+          </header>
 
-        {/* Session controls / evidence boundary */}
-        <div className="grid md:grid-cols-[1fr_auto] gap-3 items-stretch">
-          <div className="sabi-surface p-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-[#EAF3FC] text-[#1B3A7A] text-[9px] uppercase tracking-wider font-black">Question 1</span>
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-black">{blitzQuestion.subject}</span>
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-black">{blitzQuestion.difficulty}</span>
-            </div>
-            <p className="text-xs text-slate-500 mt-3">
-              No frontend speed ranking or authoritative score is calculated here.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setPracticeQuestions([]);
-              setPracticeSelectedAnswer(null);
-              setPracticeHasSubmitted(false);
-              setPracticeSessionType(null);
-            }}
-            className="px-4 py-3 rounded-2xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-[10px] uppercase tracking-wider hover:border-[#4A90D9] transition"
-          >
-            Reset preview
-          </button>
-        </div>
-
-        {/* Question workspace */}
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
-          <section className="sabi-surface overflow-hidden">
-            <div className="px-5 md:px-7 py-4 border-b border-[#D6E4F0] flex items-center justify-between gap-3">
+          <section className="mt-5 rounded-[28px] border border-white/10 bg-white/[0.045] p-5">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <span className="text-[9px] uppercase tracking-widest font-black text-[#4A90D9]">Question</span>
-                <h3 className="text-sm md:text-base font-black text-[#0A1128] mt-0.5">{blitzQuestion.topic}</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/40">Rapid practice</span>
+                <p className="text-sm font-black mt-1">One question. One decision.</p>
               </div>
-              <span className="text-[10px] font-bold text-slate-400">{blitzQuestion.year} • {blitzQuestion.exam_type}</span>
+              <span className="px-2.5 py-1 rounded-full bg-[#F5C518]/10 text-[#F5C518] text-[9px] font-black uppercase tracking-wider">Preview</span>
             </div>
+            <p className="text-xs text-white/55 leading-relaxed mt-3">
+              Blitz is built for quick repetitions. SABI's learning engine will control the sequence, session state and scoring in production.
+            </p>
+          </section>
 
-            <div className="p-5 md:p-7">
-              <div className="text-base md:text-lg font-bold leading-8 text-[#0A1128]">
+          <div className="mt-5 flex items-center justify-between">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-8 h-8 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wider font-black text-white/40">Question</p>
+                <p className="text-xs font-black truncate">{blitzQuestion.subject} · {blitzQuestion.topic}</p>
+              </div>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wider text-white/35">{blitzQuestion.difficulty}</span>
+          </div>
+
+          <main className="mt-4 rounded-[28px] bg-white text-[#0B1220] overflow-hidden shadow-2xl">
+            <div className="p-5">
+              <div className="flex items-center justify-between text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">
+                <span>{blitzQuestion.year} · {blitzQuestion.exam_type}</span>
+                <span>Rapid round</span>
+              </div>
+
+              <div className="mt-6 text-[18px] leading-[1.65] font-black tracking-[-0.015em]">
                 <MathText text={blitzQuestion.question} />
               </div>
 
-              <div className="grid gap-3 mt-7">
+              <div className="grid gap-2.5 mt-7">
                 {Object.entries(blitzQuestion.options).map(([key, value]) => {
                   const selected = practiceSelectedAnswer === key;
                   const correct = key === blitzQuestion.answer;
                   const resultClass = hasAnswer
                     ? correct
-                      ? 'border-[#15803D] bg-[#F0FDF4]'
+                      ? 'border-emerald-500 bg-emerald-50'
                       : selected
-                        ? 'border-[#B91C1C] bg-[#FEF2F2]'
-                        : 'border-slate-200 bg-white opacity-80'
+                        ? 'border-rose-500 bg-rose-50'
+                        : 'border-slate-200 bg-white opacity-55'
                     : selected
-                      ? 'border-[#4A90D9] bg-[#EAF3FC]'
-                      : 'border-slate-200 bg-white hover:border-[#4A90D9] hover:bg-[#F8FBFF]';
+                      ? 'border-[#2563EB] bg-[#EEF6FF]'
+                      : 'border-slate-200 bg-white active:scale-[0.99]';
 
                   return (
                     <button
                       key={key}
+                      type="button"
                       disabled={hasAnswer}
                       onClick={() => {
                         setPracticeQuestions([blitzQuestion]);
@@ -2199,66 +2186,63 @@ export default function App() {
                         setPracticeHasSubmitted(true);
                         setPracticeSessionType('smart');
                       }}
-                      className={`w-full text-left p-4 rounded-2xl border-2 transition flex items-start gap-3 ${resultClass}`}
+                      className={`w-full min-h-[58px] text-left px-3.5 py-3 rounded-2xl border-2 transition flex items-center gap-3 ${resultClass}`}
                     >
-                      <span className="w-9 h-9 shrink-0 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center text-xs font-black text-[#0A1128]">{key}</span>
-                      <span className="text-sm md:text-base text-slate-700 leading-relaxed pt-1"><MathText text={value as string} /></span>
-                      {hasAnswer && correct && <CheckCircle className="h-5 w-5 text-[#15803D] ml-auto shrink-0 mt-1" />}
-                      {hasAnswer && selected && !correct && <XCircle className="h-5 w-5 text-[#B91C1C] ml-auto shrink-0 mt-1" />}
+                      <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${selected ? 'bg-[#2563EB] text-white' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{key}</span>
+                      <span className="text-sm font-bold leading-relaxed flex-1"><MathText text={value as string} /></span>
+                      {hasAnswer && correct && <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />}
+                      {hasAnswer && selected && !correct && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
                     </button>
                   );
                 })}
               </div>
 
               {hasAnswer && (
-                <div className={`mt-6 rounded-2xl border p-4 ${isCorrect ? 'border-[#BBF7D0] bg-[#F0FDF4]' : 'border-[#FECACA] bg-[#FEF2F2]'}`}>
+                <section className={`mt-5 rounded-2xl p-4 border ${isCorrect ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
                   <div className="flex items-center gap-2">
-                    {isCorrect ? <CheckCircle className="h-5 w-5 text-[#15803D]" /> : <Info className="h-5 w-5 text-[#B91C1C]" />}
-                    <span className={`text-sm font-black ${isCorrect ? 'text-[#166534]' : 'text-[#991B1B]'}`}>
-                      {isCorrect ? 'Answer recorded in preview' : 'Answer recorded in preview'}
-                    </span>
+                    {isCorrect ? <CheckCircle className="w-4 h-4 text-emerald-600" /> : <Info className="w-4 h-4 text-rose-600" />}
+                    <span className="text-sm font-black">{isCorrect ? 'Correct.' : 'Not quite.'}</span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    The authoritative result, mastery update and any XP/recommendation changes must come from the backend Blitz session.
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2">
+                    <MathText text={blitzQuestion.explanation_short || blitzQuestion.explanation} />
                   </p>
-                  <div className="mt-3 pt-3 border-t border-black/5">
-                    <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Explanation preview</span>
-                    <p className="text-sm text-slate-700 mt-1 leading-relaxed">
-                      <MathText text={blitzQuestion.explanation_short || blitzQuestion.explanation} />
-                    </p>
-                  </div>
-                </div>
+                </section>
               )}
+            </div>
+
+            <div className="px-5 py-4 bg-[#F8FAFC] border-t border-slate-100">
+              <p className="text-[9px] text-[#64748B] leading-relaxed">
+                <strong className="text-[#0B1220]">Learning boundary:</strong> this preview does not create authoritative speed, XP, mastery, streak or JAMB-score data.
+              </p>
+            </div>
+          </main>
+
+          <section className="mt-4 rounded-[24px] border border-white/10 bg-white/[0.045] p-5">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/40">Why Blitz exists</span>
+            <div className="space-y-4 mt-4">
+              <div className="flex gap-3">
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">01</span>
+                <div><p className="text-xs font-black">Reduce hesitation.</p><p className="text-[10px] text-white/45 mt-1 leading-relaxed">Short, focused decisions keep you moving.</p></div>
+              </div>
+              <div className="flex gap-3">
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">02</span>
+                <div><p className="text-xs font-black">Spot patterns.</p><p className="text-[10px] text-white/45 mt-1 leading-relaxed">Repeated exposure helps the learning engine understand where to take you next.</p></div>
+              </div>
             </div>
           </section>
 
-          {/* Blitz information rail */}
-          <aside className="space-y-3">
-            <div className="sabi-surface p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-[#4A90D9]">How Blitz works</span>
-              <div className="space-y-3 mt-4">
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#EAF3FC] text-[#1B3A7A] flex items-center justify-center text-xs font-black">1</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Receive a focused question</p><p className="text-[10px] text-slate-500 mt-0.5">Selection comes from SABI's learning engine.</p></div>
-                </div>
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#FFF8D8] text-[#8A6900] flex items-center justify-center text-xs font-black">2</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Answer quickly</p><p className="text-[10px] text-slate-500 mt-0.5">Stay focused without frontend speed scoring.</p></div>
-                </div>
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center text-xs font-black">3</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Build learning evidence</p><p className="text-[10px] text-slate-500 mt-0.5">Backend services update mastery and recommendations.</p></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-[#F8FBFF] border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Backend boundary</span>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                This preview intentionally does not invent streaks, XP, mastery, readiness or predicted JAMB scores.
-              </p>
-            </div>
-          </aside>
+          <button
+            type="button"
+            onClick={() => {
+              setPracticeQuestions([]);
+              setPracticeSelectedAnswer(null);
+              setPracticeHasSubmitted(false);
+              setPracticeSessionType(null);
+            }}
+            className="w-full min-h-[50px] mt-3 rounded-2xl border border-white/10 bg-white/[0.045] text-white/65 text-xs font-black active:scale-[0.99] transition"
+          >
+            Reset preview
+          </button>
         </div>
       </div>
     );
@@ -2274,154 +2258,160 @@ export default function App() {
       .slice(0, 5);
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-          <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-24 w-44 h-44 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="relative overflow-hidden rounded-[28px] bg-white border border-slate-200 p-5 md:p-8">
+          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#2563EB]/[0.06]" />
+          <div className="absolute right-16 -bottom-28 h-52 w-52 rounded-full bg-[#F5C518]/[0.08]" />
+          <div className="relative max-w-3xl">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#2563EB]">Progress Room</span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0B1220] mt-2">You’re getting stronger.</h2>
+            <p className="text-sm md:text-base text-slate-500 mt-3 max-w-2xl leading-relaxed">
+              SABI keeps the evidence from your learning sessions here so you can see what you have actually worked on.
+            </p>
+          </div>
+          <div className="relative mt-6 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-slate-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" /> {evidenceTotal} observed attempts
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-slate-600">
+              {topicsObserved} topics observed
+            </span>
+          </div>
+        </section>
+
+        <section className="rounded-[24px] bg-[#07152F] text-white p-5 md:p-7 overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
-              <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Learning intelligence</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">Progress & Mastery</h2>
-              <p className="text-sm text-white/65 mt-2 max-w-2xl leading-relaxed">
-                See the evidence SABI has collected while the learning engine remains the source of truth for mastery, readiness and recommendations.
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-white/40">Learning engine</span>
+              <h3 className="text-xl md:text-2xl font-black mt-1">Your learning state is still syncing.</h3>
+              <p className="text-xs md:text-sm text-white/55 mt-2 max-w-2xl leading-relaxed">
+                Mastery, readiness and recommendations are authoritative backend state. SABI will show them here when the learning engine supplies them.
               </p>
             </div>
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 min-w-[220px]">
-              <span className="text-[9px] uppercase tracking-wider font-black text-white/40">Backend learning state</span>
-              <p className="text-sm font-black mt-1">Awaiting authoritative sync</p>
-              <p className="text-[10px] text-white/50 mt-1 leading-relaxed">No frontend-generated mastery or JAMB score is shown here.</p>
+            <div className="shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-white/35">Readiness</span>
+              <span className="block text-2xl font-black font-mono mt-1">—</span>
             </div>
           </div>
         </section>
 
-        <div className="grid sm:grid-cols-3 gap-3">
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Observed attempts</span>
-            <p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{evidenceTotal}</p>
-            <p className="text-[10px] text-slate-500 mt-1">Evidence recorded in this frontend state.</p>
-          </div>
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Topics with evidence</span>
-            <p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{topicsObserved}</p>
-            <p className="text-[10px] text-slate-500 mt-1">Not a mastery percentage.</p>
-          </div>
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Readiness</span>
-            <p className="text-2xl font-black text-[#0A1128] mt-1">—</p>
-            <p className="text-[10px] text-slate-500 mt-1">Supplied by the learning engine.</p>
-          </div>
-        </div>
-
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <section>
+          <div className="flex items-end justify-between gap-4 mb-3">
             <div>
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Subject evidence</span>
-              <h3 className="text-lg font-black text-[#0A1128] mt-1">Your four-subject view</h3>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Your subjects</span>
+              <h3 className="text-xl font-black text-[#0B1220] mt-1">Where you’ve been learning</h3>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">Backend mastery pending</span>
+            <span className="hidden sm:block text-[9px] font-black uppercase tracking-wider text-slate-400">Evidence only</span>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-3 mt-5">
-            {subjects.map(subject => {
-              const items = Object.values(masteryMap).filter(item => item.subject === subject);
-              const attempts = items.reduce((sum, item) => sum + item.attempts, 0);
-              const observedTopics = items.filter(item => item.attempts > 0).length;
-              const confidence = profile?.subjectConfidence?.[subject];
+          {subjects.length ? (
+            <div className="grid md:grid-cols-2 gap-3">
+              {subjects.map(subject => {
+                const items = Object.values(masteryMap).filter(item => item.subject === subject);
+                const attempts = items.reduce((sum, item) => sum + item.attempts, 0);
+                const observedTopics = items.filter(item => item.attempts > 0).length;
+                const confidence = profile?.subjectConfidence?.[subject];
 
-              return (
-                <button
-                  key={subject}
-                  type="button"
-                  onClick={() => { setMapSubject(subject); setActiveTab('mastery'); }}
-                  className="group rounded-2xl border border-slate-200 bg-white p-4 md:p-5 text-left hover:border-[#4A90D9] hover:shadow-sm transition"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Subject</span>
-                      <h4 className="text-sm md:text-base font-black text-[#0A1128] mt-1">{subject}</h4>
+                return (
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => { setMapSubject(subject); setActiveTab('mastery'); }}
+                    className="group text-left rounded-[22px] bg-white border border-slate-200 p-5 hover:border-[#2563EB]/50 hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <span className="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400">Subject</span>
+                        <h4 className="text-lg font-black text-[#0B1220] mt-1">{subject}</h4>
+                      </div>
+                      <span className="h-9 w-9 rounded-xl bg-[#F8FAFC] border border-slate-200 flex items-center justify-center group-hover:bg-[#EBF4FF] transition-colors">
+                        <ChevronRight className="w-4 h-4 text-[#2563EB]" />
+                      </span>
                     </div>
-                    <span className="w-9 h-9 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center group-hover:bg-[#EBF1FA] transition">
-                      <ChevronRight className="w-4 h-4 text-[#4A90D9]" />
-                    </span>
-                  </div>
 
-                  <div className="grid grid-cols-3 gap-2 mt-5">
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Attempts</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{attempts}</span>
+                    <div className="mt-6 flex items-end gap-6">
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Attempts</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{attempts}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Topics</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{observedTopics}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Confidence</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{confidence ? `${confidence}/5` : '—'}</span>
+                      </div>
                     </div>
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Topics</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{observedTopics}</span>
-                    </div>
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Confidence</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{confidence ? `${confidence}/5` : '—'}</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-4 flex items-center justify-between text-[9px] font-bold">
-                    <span className="text-slate-400">Open mastery map</span>
-                    <span className="text-[#4A90D9]">View topics →</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                    <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400">Observed learning evidence</span>
+                      <span className="text-[10px] font-black text-[#2563EB]">Open topics →</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[22px] border border-dashed border-slate-300 bg-white p-8 text-center">
+              <h4 className="text-sm font-black text-[#0B1220]">Your subjects will appear here.</h4>
+              <p className="text-xs text-slate-500 mt-2">Subject selection will appear after onboarding sync.</p>
+            </div>
+          )}
         </section>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-4">
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center justify-between gap-3">
+          <section className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-6">
+            <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Observed learning evidence</span>
-                <h3 className="text-lg font-black text-[#0A1128] mt-1">Recent topic activity</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Recent evidence</span>
+                <h3 className="text-xl font-black text-[#0B1220] mt-1">What you’ve worked on</h3>
               </div>
-              <span className="text-[9px] font-black uppercase text-slate-400">{recentEvidence.length} shown</span>
+              {recentEvidence.length > 0 && <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">{recentEvidence.length} shown</span>}
             </div>
 
             {recentEvidence.length > 0 ? (
-              <div className="space-y-2 mt-5">
+              <div className="mt-5 space-y-2">
                 {recentEvidence.map(item => (
-                  <div key={`${item.subject}-${item.topic}-${item.subtopic}`} className="rounded-2xl border border-slate-200 bg-white p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#EBF1FA] border border-[#D6E4F0] flex items-center justify-center shrink-0">
-                      <BookOpen className="w-4 h-4 text-[#4A90D9]" />
+                  <div key={`${item.subject}-${item.topic}-${item.subtopic}`} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-[#F8FAFC] p-3.5">
+                    <div className="h-9 w-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                      <BookOpen className="w-4 h-4 text-[#2563EB]" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-black text-[#0A1128] truncate">{item.topic}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.subject} • {item.attempts} observed attempt{item.attempts === 1 ? '' : 's'}</p>
+                      <p className="text-xs font-black text-[#0B1220] truncate">{item.topic}</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.subject} · {item.attempts} observed attempt{item.attempts === 1 ? '' : 's'}</p>
                     </div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">
-                      Evidence
-                    </span>
+                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">Observed</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] p-6 text-center">
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto">
+              <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] p-7 text-center">
+                <div className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto">
                   <BookOpen className="w-4 h-4 text-slate-400" />
                 </div>
-                <h4 className="text-sm font-black text-[#0A1128] mt-3">No observed topic evidence yet</h4>
+                <h4 className="text-sm font-black text-[#0B1220] mt-3">Your progress starts with evidence.</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Complete a practice or diagnostic session and the connected learning engine can populate this view.</p>
+                <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[10px] font-black uppercase tracking-wider">Start Practice</button>
               </div>
             )}
           </section>
 
-          <aside className="space-y-3">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <aside className="space-y-4">
+            <div className="rounded-[22px] border border-amber-200 bg-amber-50 p-5">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-700" />
-                <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Important</span>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-amber-900">How to read this room</span>
               </div>
               <h4 className="text-sm font-black text-amber-950 mt-2">Missing evidence is not zero mastery.</h4>
-              <p className="text-xs text-amber-800 mt-2 leading-relaxed">An unassessed topic should remain unassessed until the backend learning engine has enough evidence to determine its state.</p>
+              <p className="text-xs text-amber-800 mt-2 leading-relaxed">An unassessed topic stays unassessed until the learning engine has enough evidence to determine its state.</p>
             </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next action</span>
-              <h4 className="text-sm font-black text-[#0A1128] mt-1">Build more evidence</h4>
-              <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Practice now and let the connected learning engine update your learning state.</p>
-              <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 w-full py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-[10px] font-black uppercase tracking-wider">Open Practice</button>
+
+            <div className="rounded-[22px] bg-[#F8FAFC] border border-slate-200 p-5">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Next move</span>
+              <h4 className="text-base font-black text-[#0B1220] mt-1">Build useful evidence.</h4>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Practice a topic and return here to see what SABI has learned about your preparation.</p>
+              <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 w-full min-h-[48px] rounded-xl bg-[#0B1220] text-white text-[10px] font-black uppercase tracking-wider hover:bg-[#16213A] transition-colors">Open Practice</button>
             </div>
           </aside>
         </div>
@@ -2431,105 +2421,91 @@ export default function App() {
 
   function renderRecommendationsTab() {
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden shadow-sm">
-          <div className="p-6 md:p-8">
-            <div className="flex flex-wrap items-start justify-between gap-5">
-              <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10">
-                  <Sparkles className="w-3.5 h-3.5 text-[#F5C518]" />
-                  <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/70">Learning intelligence</span>
-                </div>
-                <h2 className="text-2xl md:text-4xl font-black tracking-tight mt-4">Your next best action.</h2>
-                <p className="text-sm md:text-base text-white/60 mt-3 leading-relaxed max-w-xl">
-                  SABI turns your learning evidence into a focused recommendation. The learning engine decides what matters next — the frontend only presents it.
-                </p>
-              </div>
-              <div className="w-full sm:w-auto rounded-2xl bg-white/5 border border-white/10 p-4 min-w-[180px]">
-                <span className="text-[9px] uppercase tracking-widest font-black text-white/40">Recommendation status</span>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="w-2 h-2 rounded-full bg-[#F5C518]" />
-                  <span className="text-sm font-black">Sync pending</span>
-                </div>
-                <p className="text-[10px] text-white/45 mt-1">Backend data required</p>
-              </div>
-            </div>
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="rounded-[28px] bg-[#07152F] text-white p-5 md:p-8 overflow-hidden relative">
+          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#2563EB]/20 blur-3xl" />
+          <div className="relative max-w-3xl">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Next Move</span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight mt-2">Know what to do next.</h2>
+            <p className="text-sm md:text-base text-white/60 mt-3 max-w-2xl leading-relaxed">
+              SABI is designed to turn your learning evidence into one focused next step — not a wall of recommendations.
+            </p>
           </div>
         </section>
 
-        <section className="grid lg:grid-cols-[1.35fr_.65fr] gap-5">
-          <div className="sabi-surface p-5 md:p-6">
+        <section className="grid lg:grid-cols-[1.35fr_.65fr] gap-4">
+          <div className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-7">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Current recommendation</span>
-                <h3 className="text-xl font-black text-[#0A1128] mt-1">Waiting for your learning signal</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Recommended for you</span>
+                <h3 className="text-2xl font-black text-[#0B1220] mt-2">Your next best action is loading.</h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed max-w-xl">
+                  The learning engine will choose the action, target, reason and priority from your real learning state.
+                </p>
               </div>
-              <div className="h-10 w-10 rounded-xl bg-[#F8FAFC] border border-[#D6E4F0] flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-[#4A90D9]" />
+              <div className="hidden sm:flex h-11 w-11 rounded-2xl bg-[#EBF4FF] border border-[#D6E4F0] items-center justify-center shrink-0">
+                <Sparkles className="w-5 h-5 text-[#2563EB]" />
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-dashed border-[#D6E4F0] bg-[#F8FBFF] p-5">
+            <div className="mt-6 rounded-[20px] bg-[#F8FAFC] border border-slate-200 p-4">
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  ['Action', 'Backend supplied'],
-                  ['Target', 'Backend supplied'],
-                  ['Reason', 'Backend supplied'],
-                  ['Priority', 'Backend supplied'],
-                  ['Duration', 'Backend supplied'],
-                  ['Source', 'Learning engine']
+                  ['What', 'Waiting for backend'],
+                  ['Where', 'Waiting for backend'],
+                  ['Why', 'Waiting for backend'],
+                  ['Priority', 'Waiting for backend']
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl bg-white border border-[#D6E4F0] p-3">
-                    <span className="text-[8px] uppercase tracking-widest font-black text-slate-400">{label}</span>
-                    <p className="text-xs font-black text-slate-500 mt-1">{value}</p>
+                  <div key={label} className="rounded-2xl bg-white border border-slate-200 p-4">
+                    <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-slate-400">{label}</span>
+                    <span className="block text-xs font-black text-slate-500 mt-1">{value}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-slate-500 mt-4 leading-relaxed">
-                No recommendation is fabricated while the service is unavailable. Once the backend returns one, this same surface can become the student's single clear next step.
-              </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-2 mt-5">
-              <button type="button" onClick={() => setActiveTab('practice')} className="flex-1 px-5 py-3 rounded-xl bg-[#0A1128] text-[#F5C518] font-black text-xs uppercase tracking-wider">
+            <div className="mt-5 flex flex-col sm:flex-row gap-2">
+              <button type="button" onClick={() => setActiveTab('practice')} className="min-h-[50px] flex-1 rounded-2xl bg-[#0B1220] text-white text-[10px] font-black uppercase tracking-wider hover:bg-[#16213A] transition-colors">
                 Open Practice
               </button>
-              <button type="button" onClick={() => setActiveTab('progress')} className="px-5 py-3 rounded-xl border border-[#D6E4F0] text-[#0A1128] font-black text-xs uppercase tracking-wider">
+              <button type="button" onClick={() => setActiveTab('progress')} className="min-h-[50px] px-5 rounded-2xl border border-slate-200 text-[#0B1220] text-[10px] font-black uppercase tracking-wider">
                 Review Progress
               </button>
             </div>
           </div>
 
-          <aside className="space-y-5">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">How it works</span>
-              <div className="mt-4 space-y-4">
-                {[
-                  ['01', 'Learning evidence', 'Questions, attempts and other approved signals are captured.'],
-                  ['02', 'Recommendation engine', 'The backend evaluates those signals against the learning model.'],
-                  ['03', 'Focused action', 'SABI presents one useful next step without recalculating it in the browser.']
-                ].map(([num, title, body]) => (
-                  <div key={num} className="flex gap-3">
-                    <span className="shrink-0 h-8 w-8 rounded-lg bg-[#0A1128] text-[#F5C518] flex items-center justify-center text-[9px] font-black">{num}</span>
-                    <div>
-                      <h4 className="text-xs font-black text-[#0A1128]">{title}</h4>
-                      <p className="text-[11px] text-slate-500 leading-relaxed mt-0.5">{body}</p>
-                    </div>
+          <aside className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-6">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">The intelligence loop</span>
+            <div className="mt-5 space-y-5">
+              {[
+                ['01', 'You learn', 'Practice, diagnostic and exam activity create learning evidence.'],
+                ['02', 'SABI learns', 'The backend evaluates your evidence against the learning model.'],
+                ['03', 'You continue', 'SABI presents one useful action instead of making you choose from noise.']
+              ].map(([num, title, body]) => (
+                <div key={num} className="flex gap-3">
+                  <span className="h-8 w-8 rounded-xl bg-[#07152F] text-[#F5C518] flex items-center justify-center text-[9px] font-black shrink-0">{num}</span>
+                  <div>
+                    <h4 className="text-xs font-black text-[#0B1220]">{title}</h4>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mt-1">{body}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-[#D6E4F0] bg-white p-5">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-[#4A90D9]" />
-                <span className="text-[9px] uppercase tracking-widest font-black text-[#0A1128]">Backend boundary</span>
-              </div>
-              <p className="text-[11px] text-slate-500 leading-relaxed mt-3">
-                Recommendation priority, target, reason, timing and eligibility are authoritative backend state. The frontend does not invent or rank them.
-              </p>
+                </div>
+              ))}
             </div>
           </aside>
+        </section>
+
+        <section className="rounded-[22px] border border-slate-200 bg-[#F8FAFC] p-5">
+          <div className="flex items-start gap-3">
+            <div className="h-9 w-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-4 h-4 text-[#2563EB]" />
+            </div>
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Backend boundary</span>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Recommendation target, priority, reason, timing and eligibility are authoritative server state. This screen will display those values when the learning engine supplies them; it does not fabricate or rank them.
+              </p>
+            </div>
+          </div>
         </section>
       </div>
     );
@@ -2547,176 +2523,92 @@ export default function App() {
     };
 
     const resetCbtPreview = () => {
-      setCbtPreviewConfig(null);
-      setCbtPreviewQuestions([]);
-      setCbtPreviewAnswers({});
-      setCbtPreviewFlagged({});
-      setCbtPreviewSubmitted(false);
-      setCbtPreviewIndex(0);
-      setCbtPreviewStartedAt(null);
-      setCbtPreviewTimeLeft(0);
-      setCbtPreviewConfirmSubmit(false);
+      setCbtPreviewConfig(null); setCbtPreviewQuestions([]); setCbtPreviewAnswers({});
+      setCbtPreviewFlagged({}); setCbtPreviewSubmitted(false); setCbtPreviewIndex(0);
+      setCbtPreviewStartedAt(null); setCbtPreviewTimeLeft(0); setCbtPreviewConfirmSubmit(false);
     };
 
-    const submitCbtPreview = () => {
-      setCbtPreviewConfirmSubmit(false);
-      setCbtPreviewSubmitted(true);
-    };
+    const submitCbtPreview = () => { setCbtPreviewConfirmSubmit(false); setCbtPreviewSubmitted(true); };
 
-    if (cbtPreviewConfig && !cbtPreviewSubmitted && cbtPreviewQuestions.length > 0) {
-      const selectedAnswer = currentQuestion ? cbtPreviewAnswers[currentQuestion.id] : undefined;
-      const progressPercent = cbtPreviewQuestions.length ? ((cbtPreviewIndex + 1) / cbtPreviewQuestions.length) * 100 : 0;
-      const isFlagged = currentQuestion ? Boolean(cbtPreviewFlagged[currentQuestion.id]) : false;
+    if (cbtPreviewConfig && !cbtPreviewSubmitted && cbtPreviewQuestions.length > 0 && currentQuestion) {
+      const selectedAnswer = cbtPreviewAnswers[currentQuestion.id];
+      const progressPercent = ((cbtPreviewIndex + 1) / cbtPreviewQuestions.length) * 100;
+      const isFlagged = Boolean(cbtPreviewFlagged[currentQuestion.id]);
       const isLowTime = cbtPreviewTimeLeft > 0 && cbtPreviewTimeLeft <= 300;
 
       return (
-        <div className="animate-fade-in -mx-1">
+        <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
           {cbtPreviewConfirmSubmit && (
-            <div className="fixed inset-0 z-[80] bg-[#0A1128]/70 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Submit exam preview?</span>
-                <h3 className="text-xl font-black text-[#0A1128] mt-2">Finish this CBT session?</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  You have answered {answeredCount} of {cbtPreviewQuestions.length} preview questions. Unanswered questions remain blank.
-                </p>
+            <div className="fixed inset-0 z-[90] bg-[#07152F]/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+              <div className="w-full max-w-sm rounded-[28px] bg-white text-[#0B1220] p-5 shadow-2xl">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Submit exam</span>
+                <h3 className="text-xl font-black mt-2">Finish this mock?</h3>
+                <p className="text-sm text-[#64748B] mt-2 leading-relaxed">You have answered {answeredCount} of {cbtPreviewQuestions.length}. Unanswered questions will remain blank in this preview.</p>
                 <div className="grid grid-cols-2 gap-2 mt-5">
-                  <button type="button" onClick={() => setCbtPreviewConfirmSubmit(false)} className="py-3 rounded-xl border border-slate-200 text-xs font-black text-slate-600">Keep Working</button>
-                  <button type="button" onClick={submitCbtPreview} className="py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black">Submit Preview</button>
+                  <button type="button" onClick={() => setCbtPreviewConfirmSubmit(false)} className="min-h-[50px] rounded-2xl border border-[#DCE7F2] font-black text-sm">Keep working</button>
+                  <button type="button" onClick={submitCbtPreview} className="min-h-[50px] rounded-2xl bg-[#2563EB] text-white font-black text-sm">Submit mock</button>
                 </div>
               </div>
             </div>
           )}
 
-          <header className="rounded-3xl bg-[#0A1128] text-white overflow-hidden shadow-sm">
-            <div className="p-4 md:p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={resetCbtPreview} className="h-9 w-9 rounded-xl bg-white/10 hover:bg-white/15 flex items-center justify-center" aria-label="Exit CBT preview">
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">SABI CBT</span>
-                    <h2 className="text-sm md:text-base font-black mt-0.5">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'} <span className="text-white/35 font-medium">• UI Preview</span></h2>
-                  </div>
-                </div>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${isLowTime ? 'bg-rose-500/15 border-rose-400/40 text-rose-200' : 'bg-white/10 border-white/10 text-white'}`}>
-                  <Clock className="w-4 h-4" />
-                  <span className="font-mono font-black text-sm">{formatTime(cbtPreviewTimeLeft)}</span>
-                  <span className="text-[8px] uppercase tracking-wider font-black opacity-60">preview clock</span>
-                </div>
+          <div className="max-w-xl mx-auto px-4 pt-4">
+            <header className="flex items-center justify-between gap-3">
+              <button type="button" onClick={resetCbtPreview} className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center" aria-label="Exit CBT"><ChevronLeft className="w-4 h-4" /></button>
+              <div className="text-center min-w-0">
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Exam Room</span>
+                <span className="block text-xs font-black mt-1 truncate">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'}</span>
               </div>
-              <div className="mt-5 flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-wider text-white/50">
-                <span>Question {cbtPreviewIndex + 1} of {cbtPreviewQuestions.length}</span>
-                <span>{answeredCount} answered • {flaggedCount} flagged</span>
+              <div className={`px-3 py-2 rounded-2xl border flex items-center gap-2 ${isLowTime ? 'bg-rose-500/15 border-rose-400/40 text-rose-200' : 'bg-white/[0.06] border-white/10 text-white'}`}>
+                <Clock className="w-4 h-4" /><span className="font-mono font-black text-xs">{formatTime(cbtPreviewTimeLeft)}</span>
               </div>
-              <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-[#F5C518] rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
-              </div>
+            </header>
+
+            <div className="mt-5">
+              <div className="flex items-center justify-between text-[9px] uppercase tracking-wider font-black text-white/40"><span>Question {cbtPreviewIndex + 1} of {cbtPreviewQuestions.length}</span><span>{answeredCount} answered</span></div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full bg-[#F5C518] transition-all" style={{ width: `${progressPercent}%` }} /></div>
             </div>
-          </header>
 
-          <div className="grid lg:grid-cols-[220px_1fr] gap-4 mt-4">
-            <aside className="order-2 lg:order-1 rounded-3xl border border-[#D6E4F0] bg-white p-4 h-fit lg:sticky lg:top-4">
-              <button type="button" onClick={() => setCbtPreviewShowNavigator(v => !v)} className="w-full flex items-center justify-between text-left">
-                <div>
-                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400">Exam navigator</span>
-                  <p className="text-xs font-black text-[#0A1128] mt-1">{answeredCount} answered</p>
-                </div>
-                <ChevronRight className={`w-4 h-4 text-slate-400 transition ${cbtPreviewShowNavigator ? 'rotate-90' : ''}`} />
-              </button>
+            <button type="button" onClick={() => setCbtPreviewShowNavigator(v => !v)} className="w-full mt-4 rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-3 flex items-center justify-between">
+              <span className="text-xs font-black">Question navigator</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-white/40">{flaggedCount} flagged <ChevronRight className={`w-4 h-4 inline-block ml-1 transition ${cbtPreviewShowNavigator ? 'rotate-90' : ''}`} /></span>
+            </button>
 
-              {cbtPreviewShowNavigator && (
-                <>
-                  <div className="grid grid-cols-5 gap-2 mt-4 max-h-[310px] overflow-y-auto pr-1">
-                    {cbtPreviewQuestions.map((q, index) => {
-                      const answered = Boolean(cbtPreviewAnswers[q.id]);
-                      const flagged = Boolean(cbtPreviewFlagged[q.id]);
-                      const active = index === cbtPreviewIndex;
-                      return (
-                        <button
-                          key={q.id}
-                          type="button"
-                          onClick={() => setCbtPreviewIndex(index)}
-                          aria-label={`Go to question ${index + 1}`}
-                          className={`relative h-8 rounded-lg border text-[9px] font-black transition ${
-                            active ? 'bg-[#0A1128] text-white border-[#0A1128]' :
-                            answered ? 'bg-[#EEF6FF] text-[#1B3A7A] border-[#B9D7F3]' :
-                            'bg-white text-slate-500 border-slate-200 hover:border-[#4A90D9]'
-                          }`}
-                        >
-                          {index + 1}
-                          {flagged && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border border-white" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="space-y-2 mt-4 pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded bg-[#0A1128]" /> Current</div>
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded bg-[#EEF6FF] border border-[#B9D7F3]" /> Answered</div>
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded-full bg-[#F5C518]" /> Flagged</div>
-                  </div>
-                </>
-              )}
-            </aside>
-
-            <main className="order-1 lg:order-2 rounded-3xl border border-[#D6E4F0] bg-white shadow-sm overflow-hidden">
-              <div className="p-5 md:p-7">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                  <div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black uppercase tracking-wider text-slate-500">{currentQuestion?.subject}</span>
-                    <p className="text-[10px] text-slate-400 mt-2">{currentQuestion?.topic} • {currentQuestion?.year} • {currentQuestion?.difficulty}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => currentQuestion && setCbtPreviewFlagged(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
-                    className={`px-3 py-2 rounded-xl border text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition ${
-                      isFlagged ? 'bg-[#FFF8D8] border-[#F5C518] text-[#7A5B00]' : 'bg-white border-slate-200 text-slate-500 hover:border-[#4A90D9]'
-                    }`}
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#F5C518]" />
-                    {isFlagged ? 'Flagged' : 'Flag for review'}
-                  </button>
-                </div>
-
-                <div className="text-base md:text-xl font-bold text-[#0A1128] leading-[1.8]">
-                  <MathText text={currentQuestion?.question || ''} />
-                </div>
-
-                <div className="grid gap-2.5 mt-8">
-                  {(['A', 'B', 'C', 'D'] as const).map(option => {
-                    const selected = selectedAnswer === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => currentQuestion && setCbtPreviewAnswers(prev => ({ ...prev, [currentQuestion.id]: option }))}
-                        className={`w-full text-left p-4 md:p-4.5 rounded-2xl border-2 transition flex items-start gap-3 ${
-                          selected ? 'border-[#4A90D9] bg-[#EEF6FF] text-[#0A1128] shadow-sm' : 'border-slate-200 bg-white hover:border-[#4A90D9]/60 hover:bg-[#F8FBFF]'
-                        }`}
-                      >
-                        <span className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-[10px] font-black border ${selected ? 'bg-[#0A1128] text-[#F5C518] border-[#0A1128]' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>{option}</span>
-                        <span className="text-sm leading-relaxed pt-1"><MathText text={currentQuestion?.options[option] || ''} /></span>
-                      </button>
-                    );
+            {cbtPreviewShowNavigator && (
+              <div className="mt-2 rounded-2xl border border-white/10 bg-white/[0.045] p-3">
+                <div className="grid grid-cols-8 gap-1.5 max-h-40 overflow-y-auto">
+                  {cbtPreviewQuestions.map((q, index) => {
+                    const answered = Boolean(cbtPreviewAnswers[q.id]); const flagged = Boolean(cbtPreviewFlagged[q.id]);
+                    return <button key={q.id} type="button" onClick={() => setCbtPreviewIndex(index)} className={`relative h-8 rounded-lg text-[9px] font-black border ${index === cbtPreviewIndex ? 'bg-[#F5C518] text-[#07152F] border-[#F5C518]' : answered ? 'bg-white/10 text-white border-white/10' : 'bg-transparent text-white/40 border-white/10'}`}>{index + 1}{flagged && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F5C518] border border-[#07152F]" />}</button>;
                   })}
                 </div>
+              </div>
+            )}
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-8 pt-5 border-t border-slate-100">
-                  <button type="button" disabled={cbtPreviewIndex === 0} onClick={() => setCbtPreviewIndex(i => Math.max(0, i - 1))} className="px-4 py-3 rounded-xl border border-slate-200 text-xs font-black text-slate-600 disabled:opacity-35">Previous</button>
-                  <div className="flex gap-2">
-                    {cbtPreviewIndex < cbtPreviewQuestions.length - 1 && (
-                      <button type="button" onClick={() => setCbtPreviewIndex(i => i + 1)} className="px-5 py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black">Next Question</button>
-                    )}
-                    <button type="button" onClick={() => setCbtPreviewConfirmSubmit(true)} className="px-5 py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black">
-                      Submit Exam
-                    </button>
-                  </div>
+            <main className="mt-4 rounded-[28px] bg-white text-[#0B1220] overflow-hidden shadow-2xl">
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0"><span className="inline-flex px-2.5 py-1 rounded-full bg-[#EEF6FF] text-[#1D4ED8] text-[9px] font-black uppercase tracking-wider">{currentQuestion.subject}</span><p className="text-[10px] text-[#94A3B8] mt-2 truncate">{currentQuestion.topic} · {currentQuestion.year} · {currentQuestion.difficulty}</p></div>
+                  <button type="button" onClick={() => setCbtPreviewFlagged(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))} className={`shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center ${isFlagged ? 'bg-[#FFF8D8] border-[#F5C518]' : 'border-[#DCE7F2] bg-white'}`} aria-label={isFlagged ? 'Remove flag' : 'Flag question'}><span className="w-2.5 h-2.5 rounded-full bg-[#F5C518]" /></button>
+                </div>
+
+                <div className="mt-7 text-[18px] leading-[1.65] font-black tracking-[-0.02em]"><MathText text={currentQuestion.question} /></div>
+
+                <div className="grid gap-2.5 mt-7">
+                  {(['A','B','C','D'] as const).map(option => {
+                    const selected = selectedAnswer === option;
+                    return <button key={option} type="button" onClick={() => setCbtPreviewAnswers(prev => ({ ...prev, [currentQuestion.id]: option }))} className={`w-full min-h-[58px] text-left px-3.5 py-3 rounded-2xl border-2 flex items-center gap-3 transition active:scale-[0.99] ${selected ? 'border-[#2563EB] bg-[#EEF6FF]' : 'border-[#E2E8F0] bg-white'}`}><span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${selected ? 'bg-[#07152F] text-[#F5C518]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{option}</span><span className="text-sm font-bold leading-relaxed"><MathText text={currentQuestion.options[option]} /></span></button>;
+                  })}
                 </div>
               </div>
-              <div className="px-5 md:px-7 py-3 bg-[#F8FAFC] border-t border-slate-100">
-                <p className="text-[9px] text-slate-500 leading-relaxed"><strong className="text-[#0A1128]">Preview boundary:</strong> the navigator, flag state and clock are local UI simulation. Production CBT must own question order, authoritative timer, autosave, expiry, submission, scoring and recovery.</p>
+
+              <div className="px-5 py-4 bg-[#F8FAFC] border-t border-slate-100 flex gap-2">
+                <button type="button" disabled={cbtPreviewIndex === 0} onClick={() => setCbtPreviewIndex(i => Math.max(0, i - 1))} className="min-h-[50px] px-4 rounded-2xl border border-[#DCE7F2] bg-white text-xs font-black disabled:opacity-35">Previous</button>
+                <button type="button" onClick={() => cbtPreviewIndex < cbtPreviewQuestions.length - 1 ? setCbtPreviewIndex(i => i + 1) : setCbtPreviewConfirmSubmit(true)} className="flex-1 min-h-[50px] rounded-2xl bg-[#07152F] text-white text-sm font-black">{cbtPreviewIndex < cbtPreviewQuestions.length - 1 ? 'Next question' : 'Finish mock'}</button>
               </div>
             </main>
+
+            <p className="mt-3 px-1 text-[9px] text-white/35 leading-relaxed"><strong className="text-white/55">Preview boundary:</strong> timer, question order, autosave, expiry, submission, scoring and recovery become backend-authoritative in production.</p>
           </div>
         </div>
       );
@@ -2726,57 +2618,17 @@ export default function App() {
       const answeredQuestions = cbtPreviewQuestions.filter(q => cbtPreviewAnswers[q.id]);
       const correctAnswers = answeredQuestions.filter(q => cbtPreviewAnswers[q.id] === q.answer).length;
       const unansweredCount = cbtPreviewQuestions.length - answeredQuestions.length;
+      const accuracy = answeredQuestions.length ? Math.round((correctAnswers / answeredQuestions.length) * 100) : 0;
 
       return (
-        <div className="space-y-4 animate-fade-in max-w-4xl mx-auto w-full">
-          <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-            <div className="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-[#4A90D9]/20" />
-            <div className="relative">
-              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">CBT preview complete</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">Session submitted.</h2>
-              <p className="text-sm text-white/60 mt-2 max-w-2xl">This is a local interface result. It is not an official JAMB score and does not update your SABI learning record.</p>
-            </div>
-          </section>
-
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Answered</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{answeredQuestions.length}</p></div>
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Unanswered</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{unansweredCount}</p></div>
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Preview accuracy</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{answeredQuestions.length ? Math.round((correctAnswers / answeredQuestions.length) * 100) : 0}%</p></div>
-          </div>
-
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <span className="text-[9px] uppercase tracking-wider font-black text-[#4A90D9]">Answer review</span>
-                <h3 className="text-lg font-black text-[#0A1128] mt-1">Question map</h3>
-              </div>
-              <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">{flaggedCount} flagged</span>
-            </div>
-            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 mt-5">
-              {cbtPreviewQuestions.map((q, index) => {
-                const answered = Boolean(cbtPreviewAnswers[q.id]);
-                const flagged = Boolean(cbtPreviewFlagged[q.id]);
-                const correct = answered && cbtPreviewAnswers[q.id] === q.answer;
-                return (
-                  <div key={q.id} className={`relative h-9 rounded-lg border flex items-center justify-center text-[9px] font-black ${correct ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : answered ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                    {index + 1}
-                    {flagged && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border border-white" />}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <div className="flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-amber-700" /><span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Backend boundary</span></div>
-              <p className="text-xs text-amber-800 mt-2 leading-relaxed">Official scoring, exam state, result persistence, readiness and learning updates belong to the backend exam service.</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next step</span>
-              <h4 className="text-sm font-black text-[#0A1128] mt-1">Return to exam setup.</h4>
-              <button type="button" onClick={resetCbtPreview} className="mt-4 w-full py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-wider">Back to CBT</button>
-            </div>
+        <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+          <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+            <header className="flex items-center justify-between"><button type="button" onClick={resetCbtPreview} className="w-10 h-10 rounded-full border border-[#DCE7F2] bg-white flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button><div className="text-center"><span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam submitted</span><span className="block text-[10px] text-[#64748B] mt-1">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'}</span></div><div className="w-10 h-10" /></header>
+            <section className="rounded-[28px] bg-[#07152F] text-white p-6 overflow-hidden relative"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Preview result</span><h1 className="text-2xl font-black mt-2">Mock submitted.</h1><p className="text-sm text-white/60 mt-2 leading-relaxed">This is a UI simulation. It is not an official JAMB score and does not update SABI's authoritative learning record.</p></div></section>
+            <div className="grid grid-cols-3 gap-2"><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Answered</span><p className="text-xl font-black font-mono mt-1">{answeredQuestions.length}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Blank</span><p className="text-xl font-black font-mono mt-1">{unansweredCount}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Accuracy</span><p className="text-xl font-black font-mono mt-1">{accuracy}%</p></div></div>
+            <section className="rounded-[24px] bg-white border border-[#DCE7F2] p-5"><div className="flex items-center justify-between"><div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Answer map</span><h2 className="text-lg font-black mt-1">How the mock went</h2></div><span className="text-[9px] font-black uppercase tracking-wider text-[#94A3B8]">{flaggedCount} flagged</span></div><div className="grid grid-cols-8 gap-1.5 mt-5">{cbtPreviewQuestions.map((q,index) => { const answered=Boolean(cbtPreviewAnswers[q.id]); const correct=answered&&cbtPreviewAnswers[q.id]===q.answer; const flagged=Boolean(cbtPreviewFlagged[q.id]); return <div key={q.id} className={`relative h-8 rounded-lg border flex items-center justify-center text-[8px] font-black ${correct?'bg-emerald-50 border-emerald-200 text-emerald-700':answered?'bg-rose-50 border-rose-200 text-rose-700':'bg-slate-50 border-slate-200 text-slate-400'}`}>{index+1}{flagged&&<span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F5C518] border border-white" />}</div>; })}</div></section>
+            <section className="rounded-[24px] border border-[#DCE7F2] bg-[#F4F8FD] p-5"><div className="flex items-start gap-3"><ShieldAlert className="w-4 h-4 text-[#64748B] mt-0.5" /><div><span className="text-[9px] uppercase tracking-wider font-black text-[#64748B]">Exam data boundary</span><p className="text-xs text-[#64748B] leading-relaxed mt-1">Official score, result persistence, readiness and learning updates belong to the backend exam service.</p></div></div></section>
+            <button type="button" onClick={resetCbtPreview} className="w-full min-h-[52px] rounded-2xl bg-[#2563EB] text-white text-sm font-black">Back to exam room</button>
           </div>
         </div>
       );
@@ -2787,399 +2639,352 @@ export default function App() {
       const duration = mode === 'full' ? 120 : 30;
       const questions = [...SEED_QUESTIONS].slice(0, Math.min(count, SEED_QUESTIONS.length));
       setCbtPreviewConfig({ mode, questionCount: count, durationMinutes: duration });
-      setCbtPreviewQuestions(questions);
-      setCbtPreviewIndex(0);
-      setCbtPreviewAnswers({});
-      setCbtPreviewFlagged({});
-      setCbtPreviewSubmitted(false);
-      setCbtPreviewConfirmSubmit(false);
-      setCbtPreviewStartedAt(Date.now());
-      setCbtPreviewTimeLeft(duration * 60);
+      setCbtPreviewQuestions(questions); setCbtPreviewIndex(0); setCbtPreviewAnswers({});
+      setCbtPreviewFlagged({}); setCbtPreviewSubmitted(false); setCbtPreviewConfirmSubmit(false);
+      setCbtPreviewStartedAt(Date.now()); setCbtPreviewTimeLeft(duration * 60);
     };
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-          <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-24 w-44 h-44 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div>
-              <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Exam mode</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">CBT Simulator</h2>
-              <p className="text-sm text-white/65 mt-2 max-w-2xl leading-relaxed">A focused JAMB-style interface with a question navigator, review flags, exam clock and controlled submission flow.</p>
-            </div>
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 min-w-[210px]">
-              <span className="text-[9px] uppercase tracking-wider font-black text-white/40">Production contract</span>
-              <p className="text-xs font-black mt-1">Backend exam service required</p>
-              <p className="text-[10px] text-white/50 mt-1 leading-relaxed">This build validates the interface only.</p>
-            </div>
+      <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+        <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+          <header><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam Room</span><h1 className="text-[30px] leading-tight tracking-[-0.04em] font-black mt-1">Test yourself under pressure.</h1><p className="text-sm text-[#64748B] mt-2 leading-relaxed">Choose a mock, enter a focused exam environment, and practise making decisions under time pressure.</p></header>
+          <section className="rounded-[28px] bg-[#07152F] text-white p-6 relative overflow-hidden"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">CBT simulator</span><h2 className="text-xl font-black mt-2">A separate room for exam conditions.</h2><p className="text-xs text-white/55 mt-2 leading-relaxed">The production exam service will own timing, state, autosave, submission and scoring. This build previews the experience.</p></div></section>
+          <div className="space-y-3">
+            {[{mode:'full' as const,label:'Full Mock',count:180,duration:'120 min',copy:'A complete-length exam environment.'},{mode:'quick' as const,label:'Quick Mock',count:40,duration:'30 min',copy:'A shorter simulation for focused practice.'}].map(item => (
+              <button key={item.mode} type="button" onClick={() => startPreview(item.mode)} className="w-full text-left rounded-[24px] bg-white border border-[#DCE7F2] p-5 active:scale-[0.99] transition">
+                <div className="flex items-start justify-between gap-4"><div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">{item.label}</span><h3 className="text-xl font-black mt-1">{item.count} questions</h3><p className="text-xs font-black text-[#64748B] mt-1">{item.duration}</p><p className="text-xs text-[#64748B] leading-relaxed mt-3">{item.copy}</p></div><span className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center shrink-0"><ChevronRight className="w-4 h-4" /></span></div>
+                <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-[#94A3B8]"><span className="px-2 py-1 rounded-full bg-[#F8FAFC] border border-[#E2E8F0]">UI preview</span><span>Open exam room →</span></div>
+              </button>
+            ))}
           </div>
-        </section>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {[
-            { mode: 'full' as const, label: 'Full Mock', count: 180, duration: '120 minutes', copy: 'Full production configuration for a complete mock examination.' },
-            { mode: 'quick' as const, label: 'Quick Mock', count: 40, duration: '30 minutes', copy: 'A shorter production configuration for focused exam simulation.' }
-          ].map(item => (
-            <button key={item.mode} type="button" onClick={() => startPreview(item.mode)} className="group text-left rounded-3xl border border-[#D6E4F0] bg-white p-6 shadow-sm hover:border-[#4A90D9] hover:shadow-md transition">
-              <div className="flex items-start justify-between gap-3">
-                <span className="w-10 h-10 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center"><FileText className="w-4 h-4 text-[#0A1128]" /></span>
-                <span className="px-2.5 py-1 rounded-full bg-[#F8FAFC] border border-slate-200 text-[8px] font-black uppercase tracking-wider text-slate-400">UI preview</span>
-              </div>
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9] block mt-5">{item.label}</span>
-              <h3 className="text-2xl font-black text-[#0A1128] mt-1">{item.count} questions</h3>
-              <p className="text-xs font-black text-slate-500 mt-1">{item.duration}</p>
-              <p className="text-sm text-slate-500 leading-relaxed mt-3">{item.copy}</p>
-              <span className="inline-flex items-center gap-1 mt-5 px-4 py-2.5 rounded-xl bg-[#0A1128] text-white text-[10px] font-black uppercase tracking-wider group-hover:bg-[#4A90D9] transition">Open UI Preview <ChevronRight className="w-3.5 h-3.5" /></span>
-            </button>
-          ))}
+          <section className="rounded-[24px] border border-[#DCE7F2] bg-white p-5"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#64748B]">What production CBT will own</span><div className="grid grid-cols-2 gap-2 mt-4">{['Authoritative timer','Autosave','Exam recovery','Submission receipt','Scoring','Result persistence'].map(item => <div key={item} className="rounded-xl bg-[#F8FAFC] border border-[#EEF3F8] p-3 text-[10px] font-black text-[#64748B]">{item}</div>)}</div></section>
         </div>
-
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div>
-              <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Production boundary</span>
-              <h3 className="text-sm font-black text-[#0A1128] mt-1">What will move to the exam service</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Question order, authoritative countdown, autosave, expiry handling, submission receipt, scoring, result persistence and recovery must be supplied by the backend. The frontend is intentionally not pretending otherwise.</p>
-            </div>
-          </div>
-        </section>
       </div>
     );
   }
 
-  // --- SUB-PANE: DASHBOARD ADAPTIVE PRACTICE ---
-  const customPracticeSessionLabel = () => {
-    if (practiceSessionType !== 'custom') return 'Smart Practice preview';
-    return [customPracticeSubject, customPracticeTopic === 'All' ? 'All topics' : customPracticeTopic, customPracticeYear === 'All' ? 'Any past year' : customPracticeYear]
-      .filter(Boolean)
-      .join(' • ') || 'Custom Practice preview';
-  };
 
   function renderPracticeTab() {
     if (practiceSessionType === null) {
+      const subjects = (((profile as any)?.subjects || profile?.chosenSubjects || ['English Language', 'Mathematics', 'Physics', 'Chemistry']) as SubjectName[]);
       return (
-        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto animate-fade-in pb-6">
+        <div className="min-h-full bg-[#F8FAFC] animate-fade-in pb-6">
           {customPracticeModalVisible && (
-            <div
-              className="absolute inset-0 z-[60] bg-[#0A1128]/55 backdrop-blur-md flex items-end md:items-center justify-center p-0 md:p-6"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="custom-practice-title"
-            >
-              <div className="bg-white w-full md:max-w-2xl md:rounded-3xl rounded-t-[28px] shadow-2xl border border-[#D6E4F0] overflow-hidden animate-slide-up">
-                <div className="bg-[#0A1128] text-white px-5 md:px-7 py-5 relative overflow-hidden">
-                  <div className="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#4A90D9]/20" />
-                  <div className="relative flex items-start justify-between gap-4">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">Custom Practice</span>
-                      <h3 id="custom-practice-title" className="text-xl md:text-2xl font-black mt-1">Build your practice session.</h3>
-                      <p className="text-[11px] md:text-xs text-white/60 mt-1.5 max-w-lg">
-                        Choose exactly what you want to practise. Your selections stay visible before the session starts.
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      aria-label="Close custom practice"
-                      onClick={() => setCustomPracticeModalVisible(false)}
-                      className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/15 transition shrink-0"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
+            <div className="fixed inset-0 z-[70] bg-[#07152F]/65 backdrop-blur-sm flex items-end justify-center">
+              <div className="w-full max-w-xl rounded-t-[28px] bg-white p-5 shadow-2xl animate-slide-up">
+                <div className="flex items-center justify-between mb-5">
+                  <div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Custom Practice</span><h3 className="text-xl font-black text-[#0B1220] mt-1">Build your session.</h3></div>
+                  <button type="button" onClick={() => setCustomPracticeModalVisible(false)} className="w-10 h-10 rounded-full bg-[#F1F5F9] flex items-center justify-center"><X className="w-4 h-4" /></button>
                 </div>
-
-                <div className="p-5 md:p-7 space-y-5 max-h-[72vh] overflow-y-auto">
-                  <div className="grid md:grid-cols-3 gap-3">
-                    <div className="rounded-2xl border border-[#D6E4F0] bg-[#F8FBFF] p-4">
-                      <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Subject</span>
-                      <select
-                        aria-label="Custom practice subject"
-                        className="w-full mt-2 text-sm font-bold p-3 rounded-xl border border-slate-200 bg-white text-[#0A1128] focus:outline-none focus:border-[#4A90D9]"
-                        value={customPracticeSubject || ''}
-                        onChange={e => {
-                          setCustomPracticeSubject(e.target.value as SubjectName);
-                          setCustomPracticeTopic(null);
-                        }}
-                      >
-                        <option value="" disabled>Select subject</option>
-                        {(((profile as any)?.subjects || profile?.chosenSubjects || ['English Language', 'Mathematics', 'Physics', 'Chemistry']) as SubjectName[]).map(sub => (
-                          <option key={sub} value={sub}>{sub}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="rounded-2xl border border-[#D6E4F0] bg-[#F8FBFF] p-4">
-                      <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Topic</span>
-                      <select
-                        aria-label="Custom practice topic"
-                        className="w-full mt-2 text-sm font-bold p-3 rounded-xl border border-slate-200 bg-white text-[#0A1128] focus:outline-none focus:border-[#4A90D9]"
-                        value={customPracticeTopic || ''}
-                        onChange={e => setCustomPracticeTopic(e.target.value)}
-                        disabled={!customPracticeSubject}
-                      >
-                        <option value="" disabled>{customPracticeSubject ? 'Select topic' : 'Select subject first'}</option>
-                        <option value="All">All topics</option>
-                        {Array.from(new Set(
-                          SEED_QUESTIONS
-                            .filter(q => q.subject === customPracticeSubject)
-                            .map(q => q.topic)
-                            .filter(Boolean)
-                        )).map(topic => (
-                          <option key={topic} value={topic}>{topic}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="rounded-2xl border border-[#D6E4F0] bg-[#F8FBFF] p-4">
-                      <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Exam year</span>
-                      <select
-                        aria-label="Custom practice exam year"
-                        className="w-full mt-2 text-sm font-bold p-3 rounded-xl border border-slate-200 bg-white text-[#0A1128] focus:outline-none focus:border-[#4A90D9]"
-                        value={customPracticeYear || ''}
-                        onChange={e => setCustomPracticeYear(e.target.value)}
-                      >
-                        <option value="" disabled>Select year</option>
-                        <option value="All">Any past year</option>
-                        {Array.from(new Set(
-                          SEED_QUESTIONS
-                            .filter(q => !customPracticeSubject || q.subject === customPracticeSubject)
-                            .map(q => q.year)
-                            .filter(Boolean)
-                        )).sort((a, b) => Number(b) - Number(a)).map(year => (
-                          <option key={year} value={String(year)}>{year}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl border border-[#D6E4F0] bg-white p-4 md:p-5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Session preview</span>
-                        <p className="text-sm font-black text-[#0A1128] mt-1">
-                          {customPracticeSubject || 'Choose a subject'}
-                          {customPracticeTopic ? ` • ${customPracticeTopic === 'All' ? 'All topics' : customPracticeTopic}` : ''}
-                          {customPracticeYear ? ` • ${customPracticeYear === 'All' ? 'Any past year' : customPracticeYear}` : ''}
-                        </p>
-                      </div>
-                      <span className="px-2.5 py-1 rounded-full bg-[#EAF3FC] text-[#1B3A7A] text-[9px] font-black uppercase">
-                        {customPracticeSubject && customPracticeTopic && customPracticeYear ? 'Ready to launch' : '3 selections required'}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-slate-500 mt-2">
-                      SABI will not substitute unrelated questions if this exact preview filter returns no results.
-                    </p>
-                  </div>
-
-                  <div className="flex flex-col-reverse sm:flex-row gap-2">
-                    <button
-                      type="button"
-                      onClick={() => setCustomPracticeModalVisible(false)}
-                      className="flex-1 py-3.5 rounded-2xl border border-slate-200 bg-white text-[#0A1128] text-xs font-black uppercase tracking-wider hover:bg-slate-50 transition"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleLaunchCustomPractice}
-                      disabled={!customPracticeSubject || !customPracticeTopic || !customPracticeYear}
-                      className="flex-[1.5] py-3.5 rounded-2xl bg-[#F5C518] border border-[#0A1128] text-[#0A1128] text-xs font-black uppercase tracking-wider shadow-sm disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200 disabled:shadow-none transition"
-                    >
-                      Launch Custom Practice
-                    </button>
-                  </div>
+                <div className="space-y-3">
+                  <label className="block"><span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Subject</span>
+                    <select value={customPracticeSubject || ''} onChange={e => { setCustomPracticeSubject(e.target.value as SubjectName); setCustomPracticeTopic(null); }} className="w-full mt-1.5 p-3.5 rounded-2xl border border-[#DCE7F2] font-bold text-sm bg-white">
+                      <option value="" disabled>Select subject</option>{subjects.map(sub => <option key={sub} value={sub}>{sub}</option>)}
+                    </select>
+                  </label>
+                  <label className="block"><span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Topic</span>
+                    <select value={customPracticeTopic || ''} onChange={e => setCustomPracticeTopic(e.target.value)} disabled={!customPracticeSubject} className="w-full mt-1.5 p-3.5 rounded-2xl border border-[#DCE7F2] font-bold text-sm bg-white disabled:bg-slate-50">
+                      <option value="" disabled>{customPracticeSubject ? 'Select topic' : 'Select subject first'}</option><option value="All">All topics</option>
+                      {Array.from(new Set(SEED_QUESTIONS.filter(q => q.subject === customPracticeSubject).map(q => q.topic).filter(Boolean))).map(topic => <option key={topic} value={topic}>{topic}</option>)}
+                    </select>
+                  </label>
+                  <label className="block"><span className="text-[10px] font-black uppercase tracking-wider text-slate-400">Exam year</span>
+                    <select value={customPracticeYear || ''} onChange={e => setCustomPracticeYear(e.target.value)} className="w-full mt-1.5 p-3.5 rounded-2xl border border-[#DCE7F2] font-bold text-sm bg-white">
+                      <option value="" disabled>Select year</option><option value="All">Any past year</option>
+                      {Array.from(new Set(SEED_QUESTIONS.filter(q => !customPracticeSubject || q.subject === customPracticeSubject).map(q => q.year).filter(Boolean))).sort((a,b)=>Number(b)-Number(a)).map(year => <option key={year} value={String(year)}>{year}</option>)}
+                    </select>
+                  </label>
+                </div>
+                <div className="mt-5 flex gap-2">
+                  <button type="button" onClick={() => setCustomPracticeModalVisible(false)} className="flex-1 h-12 rounded-2xl border border-[#DCE7F2] font-black text-sm">Cancel</button>
+                  <button type="button" onClick={handleLaunchCustomPractice} disabled={!customPracticeSubject || !customPracticeTopic || !customPracticeYear} className="flex-[1.5] h-12 rounded-2xl bg-[#2563EB] text-white font-black text-sm disabled:opacity-40">Start practice</button>
                 </div>
               </div>
             </div>
           )}
-          <div className="mb-5 rounded-3xl bg-[#0A1128] text-white p-5 md:p-7 relative overflow-hidden">
-            <div className="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-[#4A90D9]/20 blur-2xl" />
-            <div className="absolute right-10 bottom-[-60px] w-32 h-32 rounded-full bg-[#F5C518]/10 blur-2xl" />
-            <div className="relative">
-              <div className="flex items-center justify-between gap-3 mb-5">
-                <div className="flex items-center gap-2">
-                  <span className="w-9 h-9 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center">
-                    <BookOpen className="w-4 h-4 text-[#F5C518]" />
-                  </span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/60">Practice Hub</span>
-                </div>
-                <span className="text-[9px] font-bold px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-white/75">PREVIEW</span>
-              </div>
-              <div className="max-w-2xl">
-                <h2 className="text-2xl md:text-3xl font-black tracking-tight leading-tight">Practice with purpose.</h2>
-                <p className="mt-2 text-sm md:text-base text-white/65 leading-relaxed max-w-xl">
-                  Choose how you want to practise. Smart Practice is designed around your learning state; Custom Practice lets you control the questions yourself.
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-2 md:gap-3 mt-6 max-w-xl">
-                <div className="rounded-2xl bg-white/8 border border-white/10 p-3"><span className="text-[9px] uppercase tracking-wider text-white/45 block">Mode</span><span className="text-xs font-black mt-1 block">Focused</span></div>
-                <div className="rounded-2xl bg-white/8 border border-white/10 p-3"><span className="text-[9px] uppercase tracking-wider text-white/45 block">Selection</span><span className="text-xs font-black mt-1 block">Backend-led</span></div>
-                <div className="rounded-2xl bg-white/8 border border-white/10 p-3"><span className="text-[9px] uppercase tracking-wider text-white/45 block">Session</span><span className="text-xs font-black mt-1 block">Adaptive</span></div>
-              </div>
-            </div>
-          </div>
 
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-3.5 mb-5 flex items-start gap-3">
-            <span className="w-8 h-8 rounded-xl bg-white flex items-center justify-center shrink-0 border border-amber-100"><Info className="w-4 h-4 text-amber-700" /></span>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-wider text-amber-900">Frontend preview boundary</p>
-              <p className="text-[11px] text-amber-800 leading-relaxed mt-0.5">Seeded questions power this interface preview. The production backend must own recommendations, question selection, adaptive sequencing, mastery, XP, readiness and session persistence.</p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-5 gap-4">
-            <section className="lg:col-span-3 rounded-3xl border border-[#D6E4F0] bg-white p-5 md:p-6 shadow-sm">
-              <div className="flex items-start justify-between gap-4 mb-5">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="w-9 h-9 rounded-xl bg-[#FFF3B0] border border-[#F5C518]/60 flex items-center justify-center"><Sparkles className="w-4 h-4 text-[#0A1128]" /></span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4A90D9]">Recommended mode</span>
-                  </div>
-                  <h3 className="text-xl font-black text-[#0A1128] tracking-tight">Smart Practice</h3>
-                  <p className="text-xs text-slate-500 mt-1.5 max-w-lg leading-relaxed">Let the learning engine decide what deserves your attention next. The current build uses a safe seeded preview until recommendation APIs are connected.</p>
-                </div>
-              </div>
-              <div className="rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4 mb-4">
-                <div className="flex items-center justify-between gap-3 mb-3"><span className="text-[9px] font-black uppercase tracking-wider text-slate-400">Subject focus</span><span className="text-[9px] font-bold text-slate-400">Select one for preview</span></div>
-                <div className="flex flex-wrap gap-2">
-                  {(((profile as any)?.subjects || profile?.chosenSubjects || ['English Language', 'Mathematics', 'Physics', 'Chemistry']) as SubjectName[]).map(sub => (
-                    <button key={sub} onClick={() => setActiveSmartSubject(sub)} className={activeSmartSubject === sub ? 'px-3 py-2 rounded-xl text-[10px] font-black transition border bg-[#0A1128] text-white border-[#0A1128]' : 'px-3 py-2 rounded-xl text-[10px] font-black transition border bg-white text-slate-600 border-slate-200 hover:border-[#4A90D9]'}>
-                      {sub}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div className="flex items-center gap-3 rounded-2xl border border-[#D6E4F0] p-4 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-[#EBF1FA] flex items-center justify-center shrink-0"><RefreshCw className="w-4 h-4 text-[#4A90D9]" /></div>
-                <div className="min-w-0"><p className="text-xs font-black text-[#0A1128]">Recommendation data pending</p><p className="text-[10px] text-slate-500 leading-relaxed mt-0.5">When connected, this area will show the backend-selected next practice focus.</p></div>
-              </div>
-              <button onClick={() => handleStartSmartPractice(activeSmartSubject)} className="w-full py-3.5 bg-[#F5C518] text-[#0A1128] font-black text-xs uppercase tracking-[0.12em] rounded-2xl hover:bg-yellow-400 transition shadow-sm flex items-center justify-center gap-2">Start Smart Practice Preview<ChevronRight className="w-4 h-4" /></button>
+          <div className="max-w-xl mx-auto px-4 pt-4">
+            <section className="mb-7">
+              <span className="text-[10px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Practice</span>
+              <h1 className="text-[30px] leading-tight tracking-[-0.04em] font-black text-[#0B1220] mt-1">What do you want to work on?</h1>
+              <p className="text-sm text-[#64748B] mt-2 leading-relaxed">Choose a focused mode. SABI will keep the session simple once you start.</p>
             </section>
 
-            <section className="lg:col-span-2 rounded-3xl border border-[#D6E4F0] bg-white p-5 md:p-6 shadow-sm">
-              <div className="flex items-start gap-3 mb-5">
-                <span className="w-9 h-9 rounded-xl bg-[#EBF1FA] border border-[#D6E4F0] flex items-center justify-center"><Sliders className="w-4 h-4 text-[#0A1128]" /></span>
-                <div><span className="text-[9px] font-black uppercase tracking-[0.16em] text-slate-400">You control the mix</span><h3 className="text-xl font-black text-[#0A1128] tracking-tight mt-1">Custom Practice</h3></div>
+            <button type="button" onClick={() => handleStartSmartPractice(activeSmartSubject)}
+              className="w-full text-left rounded-[24px] bg-[#07152F] text-white p-5 relative overflow-hidden shadow-sm active:scale-[.99] transition">
+              <div className="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-[#2563EB]/35"></div>
+              <div className="relative">
+                <div className="flex items-center justify-between"><span className="text-[10px] uppercase tracking-[0.16em] font-black text-[#F5C518]">Recommended</span><Sparkles className="w-5 h-5 text-[#F5C518]" /></div>
+                <h2 className="text-2xl font-black mt-3">Smart Practice</h2>
+                <p className="text-sm text-white/65 mt-1.5 leading-relaxed">Let SABI decide what deserves your attention next.</p>
+                <div className="flex items-center gap-2 mt-5">
+                  <span className="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold">{activeSmartSubject}</span>
+                  <span className="px-3 py-1.5 rounded-full bg-white/10 text-[10px] font-bold">Adaptive</span>
+                </div>
+                <div className="mt-5 h-11 rounded-2xl bg-[#F5C518] text-[#07152F] flex items-center justify-center font-black text-sm">Start Smart Practice <span className="ml-2">→</span></div>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed mb-5">Choose a subject, topic and past exam year, then launch a focused practice session.</p>
-              <div className="space-y-2.5 mb-4">
-                <button onClick={() => setCustomPracticeModalVisible(true)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-[#4A90D9] p-3.5 text-left transition flex items-center justify-between gap-3"><div className="min-w-0"><span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Subject</span><span className="text-xs font-black text-[#0A1128] block mt-1 truncate">{customPracticeSubject || 'Choose a subject'}</span></div><ChevronRight className="w-4 h-4 text-slate-400 shrink-0" /></button>
-                <button onClick={() => setCustomPracticeModalVisible(true)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-[#4A90D9] p-3.5 text-left transition flex items-center justify-between gap-3"><div className="min-w-0"><span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Topic</span><span className="text-xs font-black text-[#0A1128] block mt-1 truncate">{customPracticeTopic ? (customPracticeTopic === 'All' ? 'All Areas' : customPracticeTopic) : 'Choose a topic'}</span></div><ChevronRight className="w-4 h-4 text-slate-400 shrink-0" /></button>
-                <button onClick={() => setCustomPracticeModalVisible(true)} className="w-full rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-[#4A90D9] p-3.5 text-left transition flex items-center justify-between gap-3"><div className="min-w-0"><span className="text-[9px] font-black uppercase tracking-wider text-slate-400 block">Exam year</span><span className="text-xs font-black text-[#0A1128] block mt-1 truncate">{customPracticeYear ? (customPracticeYear === 'All' ? 'Any past year' : customPracticeYear) : 'Choose a year'}</span></div><ChevronRight className="w-4 h-4 text-slate-400 shrink-0" /></button>
-              </div>
-              <button onClick={() => setCustomPracticeModalVisible(true)} className="w-full py-3.5 rounded-2xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-[0.12em] hover:bg-slate-800 transition">Configure Custom Practice</button>
-            </section>
-          </div>
+            </button>
 
-          <div className="mt-4 grid md:grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-white p-4"><span className="w-8 h-8 rounded-lg bg-[#F4F7FB] flex items-center justify-center text-[#4A90D9] mb-3"><Sparkles className="w-4 h-4" /></span><h4 className="text-[11px] font-black text-[#0A1128]">Smart Practice</h4><p className="text-[10px] text-slate-500 leading-relaxed mt-1">Personalized when backend recommendations are available.</p></div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4"><span className="w-8 h-8 rounded-lg bg-[#F4F7FB] flex items-center justify-center text-[#4A90D9] mb-3"><Sliders className="w-4 h-4" /></span><h4 className="text-[11px] font-black text-[#0A1128]">Custom Practice</h4><p className="text-[10px] text-slate-500 leading-relaxed mt-1">Choose your own subject, topic and year.</p></div>
-            <div className="rounded-2xl border border-slate-200 bg-white p-4"><span className="w-8 h-8 rounded-lg bg-[#F4F7FB] flex items-center justify-center text-[#4A90D9] mb-3"><BookOpen className="w-4 h-4" /></span><h4 className="text-[11px] font-black text-[#0A1128]">Shared question flow</h4><p className="text-[10px] text-slate-500 leading-relaxed mt-1">Answer, review and learn in one consistent experience.</p></div>
+            <section className="mt-7">
+              <div className="flex items-center justify-between mb-3"><h2 className="text-lg font-black text-[#0B1220]">Choose your subject</h2><span className="text-[10px] font-bold text-[#64748B]">Preview</span></div>
+              <div className="flex gap-2 overflow-x-auto pb-1">
+                {subjects.map(sub => <button key={sub} type="button" onClick={() => setActiveSmartSubject(sub)} className={`shrink-0 px-4 py-2.5 rounded-full border text-xs font-black transition ${activeSmartSubject===sub ? 'bg-[#2563EB] text-white border-[#2563EB]' : 'bg-white text-[#0B1220] border-[#DCE7F2]'}`}>{sub}</button>)}
+              </div>
+            </section>
+
+            <section className="mt-7 grid grid-cols-1 gap-3">
+              <button type="button" onClick={() => setCustomPracticeModalVisible(true)} className="rounded-[22px] border border-[#DCE7F2] bg-white p-5 text-left active:scale-[.99] transition">
+                <div className="flex items-center justify-between"><div className="w-10 h-10 rounded-xl bg-[#EAF3FF] text-[#2563EB] flex items-center justify-center"><Sliders className="w-5 h-5" /></div><ChevronRight className="w-5 h-5 text-slate-400" /></div>
+                <h3 className="text-lg font-black text-[#0B1220] mt-4">Custom Practice</h3>
+                <p className="text-xs text-[#64748B] mt-1 leading-relaxed">Pick the subject, topic and exam year yourself.</p>
+              </button>
+              <button type="button" onClick={() => setActiveTab('blitz')} className="rounded-[22px] border border-[#DCE7F2] bg-white p-5 text-left active:scale-[.99] transition">
+                <div className="flex items-center justify-between"><div className="w-10 h-10 rounded-xl bg-[#FFF4C7] text-[#8A6900] flex items-center justify-center"><Zap className="w-5 h-5" /></div><ChevronRight className="w-5 h-5 text-slate-400" /></div>
+                <h3 className="text-lg font-black text-[#0B1220] mt-4">Blitz</h3>
+                <p className="text-xs text-[#64748B] mt-1 leading-relaxed">One quick question at a time. Keep your momentum.</p>
+              </button>
+            </section>
+
+            <div className="mt-6 flex items-start gap-2.5 px-1">
+              <Info className="w-4 h-4 text-[#64748B] shrink-0 mt-0.5" />
+              <p className="text-[10px] text-[#64748B] leading-relaxed">This build is still a frontend preview. Question selection, adaptive sequencing, mastery and session persistence remain backend responsibilities.</p>
+            </div>
           </div>
         </div>
       );
     }
 
-    if (practiceQuestions.length === 0) {
-      return <div className="sabi-surface p-6 text-center space-y-4 max-w-xl mx-auto w-full"><div className="w-12 h-12 rounded-2xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center mx-auto"><AlertCircle className="h-5 w-5 text-[#4A90D9]" /></div><div><h4 className="text-base font-black text-[#0A1128]">No preview questions available</h4><p className="text-xs text-slate-500 mt-1">The selected configuration returned no seeded preview questions.</p></div><button onClick={() => { setPracticeSessionType(null); setPracticeQuestions([]); setPracticeComplete(false); }} className="px-5 py-2.5 rounded-xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-wider">Return to Practice Hub</button></div>;
-    }
-
     if (practiceComplete) {
       const accuracy = practiceQuestions.length ? Math.round((practiceCorrectCount / practiceQuestions.length) * 100) : 0;
       const selectedLabel = customPracticeSessionLabel();
+      const resultTone = accuracy >= 70 ? 'strong' : accuracy >= 50 ? 'building' : 'keep-going';
+      const resultMessage = resultTone === 'strong'
+        ? 'You handled this session well. Keep the same focus going.'
+        : resultTone === 'building'
+          ? 'You are building the pattern. Review what missed, then try again.'
+          : 'This is useful information. Your next session should target the gaps you just exposed.';
+
       return (
-        <div className="max-w-4xl mx-auto w-full animate-fade-in space-y-4">
-          <section className="relative overflow-hidden rounded-3xl bg-[#0A1128] text-white p-6 md:p-8">
-            <div className="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-[#4A90D9]/20" />
-            <div className="absolute right-16 -bottom-20 w-36 h-36 rounded-full bg-[#F5C518]/10" />
-            <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-5">
-              <div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Session complete</span>
-                <h3 className="text-2xl md:text-3xl font-black mt-2">Practice review finished.</h3>
-                <p className="text-sm text-white/65 mt-2 max-w-xl">Your answers have been reviewed in this frontend preview. Production mastery and learning progress remain backend-owned.</p>
+        <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+          <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+            <header className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }}
+                className="w-10 h-10 rounded-full border border-[#DCE7F2] bg-white flex items-center justify-center text-[#0B1220] shadow-sm active:scale-95"
+                aria-label="Back to Practice"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <div className="text-center">
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Session complete</span>
+                <span className="block text-[10px] text-[#64748B] mt-1">{selectedLabel}</span>
               </div>
-              <div className="rounded-2xl bg-white/10 border border-white/10 px-4 py-3 min-w-[190px]">
-                <span className="text-[9px] uppercase tracking-wider font-black text-white/45">Session</span>
-                <p className="text-xs font-black mt-1">{selectedLabel}</p>
-              </div>
-            </div>
-          </section>
+              <div className="w-10 h-10" />
+            </header>
 
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Questions reviewed</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{practiceQuestions.length}</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Correct in preview</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{practiceCorrectCount}</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Preview accuracy</span>
-              <p className="text-2xl font-black text-[#0A1128] mt-1 font-mono">{accuracy}%</p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-[1fr_300px] gap-4">
-            <section className="sabi-surface p-5 md:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <span className="text-[9px] uppercase tracking-wider font-black text-[#4A90D9]">Review summary</span>
-                  <h4 className="text-lg font-black text-[#0A1128] mt-1">What you just practised</h4>
+            <section className="relative overflow-hidden rounded-[28px] bg-[#07152F] text-white p-6 md:p-7">
+              <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" />
+              <div className="absolute -left-12 -bottom-16 w-36 h-36 rounded-full bg-[#F5C518]/10" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Review complete
+                    </span>
+                    <h1 className="text-[30px] leading-[1.05] tracking-[-0.04em] font-black mt-3">
+                      {accuracy}%<span className="text-white/35">.</span>
+                    </h1>
+                    <p className="text-sm leading-relaxed text-white/65 mt-2 max-w-sm">{resultMessage}</p>
+                  </div>
+                  <div className="shrink-0 w-14 h-14 rounded-2xl border border-white/10 bg-white/[0.07] flex items-center justify-center">
+                    <span className="text-lg font-black font-mono">{practiceCorrectCount}/{practiceQuestions.length}</span>
+                  </div>
                 </div>
-                <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">Local preview</span>
+
+                <div className="mt-6 h-2 rounded-full bg-white/10 overflow-hidden">
+                  <div className="h-full rounded-full bg-[#F5C518] transition-all" style={{ width: Math.min(100, accuracy) + '%' }} />
+                </div>
+                <div className="flex items-center justify-between mt-2 text-[9px] uppercase tracking-wider font-black text-white/40">
+                  <span>{practiceCorrectCount} correct</span>
+                  <span>{practiceQuestions.length - practiceCorrectCount} to review</span>
+                </div>
               </div>
-              <div className="space-y-2 mt-5">
+            </section>
+
+            <section className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-white border border-[#DCE7F2] p-4">
+                <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">Questions</span>
+                <p className="text-2xl font-black font-mono mt-1">{practiceQuestions.length}</p>
+              </div>
+              <div className="rounded-2xl bg-white border border-[#DCE7F2] p-4">
+                <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">Correct</span>
+                <p className="text-2xl font-black font-mono mt-1">{practiceCorrectCount}</p>
+              </div>
+            </section>
+
+            <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+              <div className="px-5 pt-5 pb-3">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Session review</span>
+                <h2 className="text-lg font-black mt-1 tracking-[-0.02em]">What you just worked on</h2>
+              </div>
+              <div className="divide-y divide-[#EEF3F8]">
                 {practiceQuestions.map((q, idx) => (
-                  <div key={q.id} className="rounded-2xl border border-slate-200 bg-white p-3.5 flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center text-[10px] font-black text-[#0A1128] shrink-0">{idx + 1}</span>
+                  <div key={q.id} className="px-5 py-3.5 flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-xl bg-[#F1F5F9] flex items-center justify-center text-[10px] font-black text-[#0B1220] shrink-0">{idx + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-black text-[#0A1128] truncate">{q.topic}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{q.subject} • {q.year} • {q.difficulty}</p>
+                      <p className="text-xs font-black truncate">{q.topic}</p>
+                      <p className="text-[10px] text-[#64748B] mt-0.5 truncate">{q.subject} • {q.year} • {q.difficulty}</p>
                     </div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">Reviewed</span>
+                    <span className="text-[9px] uppercase tracking-wider font-black text-[#94A3B8] shrink-0">Reviewed</span>
                   </div>
                 ))}
               </div>
             </section>
 
-            <aside className="space-y-3">
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                <div className="flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-amber-700" />
-                  <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Backend boundary</span>
+            <section className="rounded-[24px] border border-[#DCE7F2] bg-[#F4F8FD] p-5">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white border border-[#DCE7F2] flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-4 h-4 text-[#64748B]" />
                 </div>
-                <p className="text-xs text-amber-800 mt-2 leading-relaxed">This preview does not update mastery, XP, readiness, recommendations, streaks or JAMB score.</p>
-              </div>
-              <div className="sabi-surface p-5">
-                <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next step</span>
-                <h4 className="text-sm font-black text-[#0A1128] mt-1">Keep the momentum going.</h4>
-                <div className="space-y-2 mt-4">
-                  <button onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }} className="w-full py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-[10px] font-black uppercase tracking-wider">Practice Again</button>
-                  <button onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('progress'); }} className="w-full py-3 rounded-xl border border-[#D6E4F0] bg-white text-[#0A1128] text-[10px] font-black uppercase tracking-wider">View Progress</button>
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-[#64748B]">Learning data</span>
+                  <p className="text-xs leading-relaxed text-[#64748B] mt-1">
+                    This frontend preview does not write mastery, readiness, recommendations, streaks, XP or JAMB score. Those values stay backend-owned.
+                  </p>
                 </div>
               </div>
-            </aside>
+            </section>
+
+            <div className="space-y-2 pt-1">
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('practice'); }}
+                className="w-full min-h-[52px] rounded-2xl bg-[#2563EB] text-white text-sm font-black shadow-sm active:scale-[0.99] transition"
+              >
+                Practice again
+              </button>
+              <button
+                type="button"
+                onClick={() => { setPracticeComplete(false); setPracticeSessionType(null); setPracticeQuestions([]); setActiveTab('progress'); }}
+                className="w-full min-h-[50px] rounded-2xl border border-[#DCE7F2] bg-white text-[#0B1220] text-sm font-black active:scale-[0.99] transition"
+              >
+                View progress
+              </button>
+            </div>
           </div>
         </div>
       );
     }
 
     const currentQ = practiceQuestions[practiceIndex];
+    if (!currentQ) return null;
     const progress = ((practiceIndex + (practiceHasSubmitted ? 1 : 0)) / practiceQuestions.length) * 100;
+    const answered = practiceHasSubmitted;
+    const correct = answered && practiceSelectedAnswer === currentQ.answer;
+
     return (
-      <div className="flex flex-col animate-fade-in relative">
-        {showExitQuizModal && <div className="absolute inset-0 z-50 bg-slate-900/50 backdrop-blur-sm rounded-3xl flex items-center justify-center p-4"><div className="bg-white rounded-3xl p-6 shadow-2xl w-full max-w-sm"><h3 className="text-lg font-black text-[#0A1128]">Leave this practice session?</h3><p className="text-xs text-slate-500 mt-2">Current preview answers are local only.</p><div className="grid grid-cols-2 gap-2 mt-5"><button onClick={() => setShowExitQuizModal(false)} className="py-3 rounded-xl border border-slate-200 text-xs font-black">Stay</button><button onClick={handleQuizExitAndSave} className="py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black">Exit Preview</button></div></div></div>}
-        <div className="rounded-3xl bg-[#0A1128] text-white p-4 md:p-5 relative overflow-hidden"><div className="relative"><div className="flex items-center justify-between gap-3"><button onClick={() => setShowExitQuizModal(true)} className="flex items-center gap-1 text-[10px] font-black uppercase text-white/60"><ChevronLeft className="w-4 h-4" /> Exit</button><div className="text-center"><span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#F5C518] block">{practiceSessionType === 'smart' ? 'Smart Practice' : 'Custom Practice'}</span><span className="text-[10px] text-white/55 block mt-1">{currentQ.subject}</span></div><span className="text-[10px] font-black font-mono text-white/70">{practiceIndex + 1}/${practiceQuestions.length}</span></div><div className="mt-5 h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-[#F5C518] rounded-full" style={{width: Math.min(100, progress) + '%'}} /></div><div className="flex justify-between mt-3 text-[9px] font-bold text-white/50 uppercase"><span>{currentQ.topic}</span><span>{currentQ.difficulty} difficulty</span></div></div></div>
-        <div className="grid lg:grid-cols-3 gap-4 mt-4"><main className="lg:col-span-2 rounded-3xl border border-[#D6E4F0] bg-white p-5 md:p-7 shadow-sm"><div className="flex justify-between mb-5"><span className="text-[9px] font-black uppercase tracking-[0.18em] text-[#4A90D9]">Question {practiceIndex + 1}</span><span className="text-[9px] font-bold text-slate-400">Preview question</span></div><div className="text-base md:text-lg font-bold text-[#0A1128] leading-[1.8]"><MathText text={currentQ.question} /></div><div className="space-y-2.5 mt-7">{Object.entries(currentQ.options).map(([key, value]) => { const correct = key === currentQ.answer, selected = practiceSelectedAnswer === key; let style = 'border-slate-200 bg-white hover:border-[#4A90D9] hover:bg-[#F8FBFF] text-slate-700'; if (practiceHasSubmitted) style = selected && correct ? 'border-emerald-500 bg-emerald-50 text-emerald-950' : selected ? 'border-rose-500 bg-rose-50 text-rose-950' : correct ? 'border-emerald-500 bg-emerald-50 text-emerald-950' : 'border-slate-100 bg-slate-50 text-slate-400 opacity-60'; else if (selected) style = 'border-[#0A1128] bg-[#F4F7FB] text-[#0A1128] ring-2 ring-[#0A1128]/5'; return <button key={key} type="button" disabled={practiceHasSubmitted} onClick={() => !practiceHasSubmitted && setPracticeSelectedAnswer(key as any)} className={'w-full p-4 rounded-2xl border text-left transition flex items-start gap-3 ' + style}><span className={'w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-[10px] font-black border ' + (selected ? 'bg-[#0A1128] text-[#F5C518] border-[#0A1128]' : 'bg-slate-50 text-slate-500 border-slate-200')}>{key}</span><span className="text-sm leading-relaxed pt-1"><MathText text={value as string} /></span></button>; })}</div>{practiceHasSubmitted && <div className="mt-5 rounded-2xl border border-[#D6E4F0] bg-[#F8FAFC] p-4">{!aiExplainText && !aiExplainLoading ? <div className="flex items-center justify-between gap-4"><div><p className="text-[9px] font-black uppercase tracking-wider text-[#4A90D9]">Sabi AI Coach</p><p className="text-[11px] text-slate-500 mt-1">See a step-by-step explanation.</p></div><button onClick={fetchPracticeExplanation} className="px-4 py-2.5 rounded-xl bg-[#0A1128] text-[#F5C518] text-[10px] font-black">Explain</button></div> : aiExplainLoading ? <div className="flex items-center gap-2 text-[#4A90D9] text-[10px]"><Loader2 className="h-4 w-4 animate-spin" /> Coach is drafting an explanation…</div> : <div><span className="text-[9px] uppercase font-black tracking-wider text-[#4A90D9]">Worked explanation</span><div className="text-xs text-slate-800 leading-relaxed mt-2"><MathText text={aiExplainText} /></div></div>}</div>}<div className="mt-6"><button onClick={practiceHasSubmitted ? handleNextPracticeStep : handleSubmitPracticeChoice} disabled={!practiceHasSubmitted && !practiceSelectedAnswer} className={'w-full py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider ' + (practiceHasSubmitted ? 'bg-[#0A1128] text-white' : practiceSelectedAnswer ? 'bg-[#F5C518] text-[#0A1128]' : 'bg-slate-100 text-slate-400 cursor-not-allowed')}>{practiceHasSubmitted ? (practiceIndex === practiceQuestions.length - 1 ? 'Finish Session' : 'Next Question') : 'Submit Answer'}</button></div></main>
-        <aside className="rounded-3xl border border-[#D6E4F0] bg-white p-5 h-fit"><div className="flex items-center gap-2 mb-4"><span className="w-9 h-9 rounded-xl bg-[#EBF1FA] flex items-center justify-center"><Info className="w-4 h-4 text-[#4A90D9]" /></span><h4 className="text-sm font-black text-[#0A1128]">Practice guide</h4></div><div className="space-y-4"><div><span className="text-[9px] font-black uppercase text-slate-400">1. Choose</span><p className="text-[10px] text-slate-500 mt-1">Select one answer before submitting.</p></div><div><span className="text-[9px] font-black uppercase text-slate-400">2. Review</span><p className="text-[10px] text-slate-500 mt-1">Review the answer and explanation after submission.</p></div><div><span className="text-[9px] font-black uppercase text-slate-400">3. Learn</span><p className="text-[10px] text-slate-500 mt-1">Production learning evidence will be handled by the backend.</p></div></div><div className="mt-5 rounded-2xl bg-amber-50 border border-amber-200 p-3"><p className="text-[9px] font-black uppercase text-amber-900">Preview boundary</p><p className="text-[10px] text-amber-800 mt-1">No XP, mastery, readiness, recommendation or JAMB score changes here.</p></div></aside></div>
+      <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
+        {showExitQuizModal && (
+          <div className="fixed inset-0 z-[80] bg-[#07152F]/75 backdrop-blur-sm flex items-center justify-center p-5">
+            <div className="w-full max-w-sm rounded-[24px] bg-white text-[#0B1220] p-5">
+              <h3 className="text-xl font-black">Leave this session?</h3>
+              <p className="text-sm text-[#64748B] mt-2">Your preview answers are local only.</p>
+              <div className="grid grid-cols-2 gap-2 mt-5">
+                <button type="button" onClick={() => setShowExitQuizModal(false)} className="h-12 rounded-2xl border border-[#DCE7F2] font-black text-sm">Stay</button>
+                <button type="button" onClick={handleQuizExitAndSave} className="h-12 rounded-2xl bg-[#07152F] text-white font-black text-sm">Exit</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="max-w-xl mx-auto px-4 pt-4">
+          <header className="flex items-center justify-between">
+            <button type="button" onClick={() => setShowExitQuizModal(true)} className="flex items-center gap-1 text-xs font-black text-white/65"><ChevronLeft className="w-4 h-4" /> Exit</button>
+            <div className="text-center">
+              <span className="block text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">{practiceSessionType === 'smart' ? 'Smart Practice' : 'Custom Practice'}</span>
+              <span className="block text-[10px] text-white/55 mt-1">{currentQ.subject}</span>
+            </div>
+            <span className="text-xs font-black font-mono text-white/70">{practiceIndex + 1}/{practiceQuestions.length}</span>
+          </header>
+
+          <div className="mt-5">
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-[#F5C518] rounded-full transition-all" style={{width: Math.min(100,progress)+'%'}} /></div>
+            <div className="flex justify-between mt-2 text-[9px] font-bold uppercase tracking-wider text-white/40"><span>{currentQ.topic}</span><span>{currentQ.difficulty}</span></div>
+          </div>
+
+          <main className="mt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="px-2.5 py-1 rounded-full bg-white/10 border border-white/10 text-[9px] font-black uppercase tracking-wider text-white/70">{currentQ.exam_type}</span>
+              <span className="text-[10px] text-white/35">{currentQ.year}</span>
+            </div>
+
+            <h1 className="text-[25px] leading-[1.38] font-black tracking-[-0.025em]">
+              <MathText text={currentQ.question} />
+            </h1>
+
+            <div className="space-y-2.5 mt-8">
+              {(['A','B','C','D'] as const).map(option => {
+                const selected = practiceSelectedAnswer === option;
+                const isRight = option === currentQ.answer;
+                const state = !answered ? (selected ? 'selected' : 'idle') : (isRight ? 'correct' : selected ? 'wrong' : 'muted');
+                return (
+                  <button key={option} type="button" disabled={answered} onClick={() => setPracticeSelectedAnswer(option)}
+                    className={`w-full min-h-[68px] rounded-[20px] border-2 px-4 py-3.5 flex items-center gap-3 text-left transition active:scale-[.99] ${state==='selected' ? 'bg-[#1457C7] border-[#4C8DFF] text-white' : state==='correct' ? 'bg-[#0F5132] border-[#2FBF71] text-white' : state==='wrong' ? 'bg-[#642D35] border-[#E56B7A] text-white' : state==='muted' ? 'bg-white/[0.035] border-white/5 text-white/35' : 'bg-white/[0.045] border-white/10 text-white hover:border-white/25'}`}>
+                    <span className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center font-black text-sm ${state==='selected' ? 'bg-white text-[#1457C7]' : state==='correct' ? 'bg-[#2FBF71] text-[#07152F]' : state==='wrong' ? 'bg-[#E56B7A] text-[#07152F]' : 'bg-white/10 text-white/65'}`}>{option}</span>
+                    <span className="text-sm leading-relaxed"><MathText text={currentQ.options[option]} /></span>
+                    {state==='correct' && <CheckCircle className="w-5 h-5 ml-auto shrink-0 text-[#65E3A0]" />}
+                    {state==='wrong' && <XCircle className="w-5 h-5 ml-auto shrink-0 text-[#FF9AA6]" />}
+                  </button>
+                );
+              })}
+            </div>
+
+            {!answered && (
+              <p className="text-[10px] text-white/35 text-center mt-5">Choose the answer you believe is correct.</p>
+            )}
+
+            {answered && (
+              <section className={`mt-6 rounded-[22px] border p-5 ${correct ? 'bg-[#0F5132]/35 border-[#2FBF71]/40' : 'bg-[#642D35]/35 border-[#E56B7A]/35'}`}>
+                <div className="flex items-center gap-2">
+                  {correct ? <CheckCircle className="w-5 h-5 text-[#65E3A0]" /> : <XCircle className="w-5 h-5 text-[#FF9AA6]" />}
+                  <span className="text-sm font-black">{correct ? 'Correct.' : 'Not quite.'}</span>
+                </div>
+                {!correct && <p className="text-xs text-white/75 mt-2">Think about the key idea behind the question before moving on.</p>}
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-white/45">Why</span>
+                  <p className="text-sm text-white/80 leading-relaxed mt-1.5"><MathText text={currentQ.explanation_short || currentQ.explanation} /></p>
+                </div>
+              </section>
+            )}
+
+            <div className="mt-6">
+              {answered ? (
+                <button type="button" onClick={() => {
+                  if (practiceIndex < practiceQuestions.length - 1) {
+                    setPracticeIndex(i => i + 1); setPracticeSelectedAnswer(null); setPracticeHasSubmitted(false);
+                  } else {
+                    setPracticeComplete(true);
+                  }
+                }} className="w-full min-h-[52px] rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm active:scale-[.99] transition">
+                  {practiceIndex < practiceQuestions.length - 1 ? 'Continue →' : 'Finish session →'}
+                </button>
+              ) : (
+                <button type="button" disabled={!practiceSelectedAnswer} onClick={() => setPracticeHasSubmitted(true)}
+                  className="w-full h-13 rounded-2xl bg-[#F5C518] text-[#07152F] font-black text-sm disabled:opacity-35 transition">Check answer</button>
+              )}
+            </div>
+
+            <div className="mt-7 pt-5 border-t border-white/10 flex items-center justify-between text-[9px] text-white/35">
+              <span>Learning mode</span><span>Preview session</span>
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
 
-  // --- SUB-PANE: DASHBOARD MASTERY MAP CORE ---
+
   function renderMasteryTab() {
     return (
       <MasteryMap
@@ -3222,32 +3027,32 @@ export default function App() {
   function renderProfileTab() {
     if (!profile) return null;
 
-    const initials = profile.name.trim().split(/\\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+    const initials = profile.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
 
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden">
-          <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="rounded-[28px] bg-white border border-slate-200 p-5 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-xl font-black text-[#F5C518]">
+              <div className="h-16 w-16 md:h-20 md:w-20 rounded-[22px] bg-[#07152F] text-[#F5C518] flex items-center justify-center text-xl md:text-2xl font-black shrink-0">
                 {initials || 'S'}
               </div>
               <div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-white/45">Student profile</span>
-                <h2 className="text-2xl md:text-3xl font-black mt-1">{profile.name}</h2>
-                <p className="text-xs text-white/55 mt-1">Your profile describes your learning context. Authoritative account state comes from the backend.</p>
+                <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#2563EB]">Your SABI profile</span>
+                <h2 className="text-2xl md:text-4xl font-black text-[#0B1220] mt-1">{profile.name}</h2>
+                <p className="text-xs md:text-sm text-slate-500 mt-2 max-w-xl">Your profile gives SABI the context it needs to make your preparation more relevant.</p>
               </div>
             </div>
-            <button type="button" onClick={() => setActiveTab('settings')} className="px-4 py-2.5 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black uppercase tracking-wider">
-              Account settings
+            <button type="button" onClick={() => setActiveTab('settings')} className="min-h-[46px] px-5 rounded-2xl bg-[#07152F] text-white text-[10px] font-black uppercase tracking-wider">
+              Manage account
             </button>
           </div>
         </section>
 
-        <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-5">
-          <section className="sabi-surface p-5 md:p-6">
-            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Your learning profile</span>
-            <h3 className="text-lg font-black text-[#0A1128] mt-1">Personalized context</h3>
+        <div className="grid lg:grid-cols-[1.15fr_.85fr] gap-4">
+          <section className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-7">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Learning context</span>
+            <h3 className="text-xl font-black text-[#0B1220] mt-1">Who SABI is preparing for</h3>
             <div className="grid sm:grid-cols-2 gap-3 mt-5">
               {[
                 ['Target course', profile.targetCourse || 'Not set'],
@@ -3257,26 +3062,28 @@ export default function App() {
                 ['Explanation style', profile.explanationPreference || 'Not set'],
                 ['Study history', profile.attempts || 'Not set']
               ].map(([label, value]) => (
-                <div key={label} className="rounded-2xl border border-[#D6E4F0] bg-[#F8FBFF] p-4">
-                  <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">{label}</span>
-                  <p className="text-xs font-black text-[#0A1128] mt-1 leading-relaxed">{String(value)}</p>
+                <div key={label} className="rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4">
+                  <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-slate-400">{label}</span>
+                  <p className="text-xs font-black text-[#0B1220] mt-1 leading-relaxed">{String(value)}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="space-y-5">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Chosen subjects</span>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {(profile.chosenSubjects || []).map(subject => (
-                  <span key={subject} className="px-3 py-1.5 rounded-full bg-[#EBF4FF] border border-[#D6E4F0] text-[10px] font-black text-[#0A1128]">{subject}</span>
-                ))}
+          <div className="space-y-4">
+            <section className="rounded-[24px] bg-[#07152F] text-white p-5 md:p-6">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">Your JAMB subjects</span>
+              <div className="mt-4 space-y-2">
+                {(profile.chosenSubjects || []).length ? (profile.chosenSubjects || []).map((subject, index) => (
+                  <div key={subject} className="flex items-center gap-3 rounded-2xl bg-white/[0.06] border border-white/10 px-4 py-3">
+                    <span className="h-7 w-7 rounded-lg bg-white/10 flex items-center justify-center text-[9px] font-black text-[#F5C518]">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="text-xs font-black">{subject}</span>
+                  </div>
+                )) : <p className="text-xs text-white/50">Subject selection will appear after onboarding sync.</p>}
               </div>
-              {!(profile.chosenSubjects || []).length && <p className="text-xs text-slate-500 mt-3">Subject selection will appear after onboarding sync.</p>}
-            </div>
+            </section>
 
-            <div className="sabi-surface p-5">
+            <section className="rounded-[24px] bg-[#F8FAFC] border border-slate-200 p-5">
               <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Account state</span>
               <div className="mt-3 space-y-2">
                 {[
@@ -3284,24 +3091,24 @@ export default function App() {
                   ['AI credits', 'Backend sync pending'],
                   ['Streak', 'Backend sync pending']
                 ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between gap-3 py-2 border-b last:border-0 border-slate-100">
+                  <div key={label} className="flex items-center justify-between gap-3 py-2.5 border-b last:border-0 border-slate-200">
                     <span className="text-[10px] font-bold text-slate-500">{label}</span>
-                    <span className="text-[10px] font-black text-[#0A1128]">{value}</span>
+                    <span className="text-[10px] font-black text-[#0B1220]">{value}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
 
-        <section className="rounded-2xl border border-[#D6E4F0] bg-white p-5 md:p-6">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-[#4A90D9]" />
-            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#0A1128]">Account boundary</span>
+        <section className="rounded-[22px] border border-slate-200 bg-white p-5 md:p-6">
+          <div className="flex items-start gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[#EBF4FF] border border-[#D6E4F0] flex items-center justify-center shrink-0"><ShieldAlert className="w-4 h-4 text-[#2563EB]" /></div>
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Data boundary</span>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">Subscription, entitlements, payments, AI credits, streaks and other authoritative account metrics remain server state. SABI will show them when the account service supplies them.</p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-            Subscription, entitlements, payments, AI-credit balance, streaks and other authoritative account metrics are server state. This frontend never invents values for them.
-          </p>
         </section>
       </div>
     );
@@ -3309,72 +3116,153 @@ export default function App() {
 
   // --- SUB-PANE: DASHBOARD SETTINGS TAB ---
   function renderSettingsTab() {
+    if (!profile) return null;
+
+    const preferenceRows = [
+      ['Language', profile.languagePreference || 'Not set'],
+      ['Explanation style', profile.explanationPreference || 'Not set'],
+    ];
+
+    const accountRows = [
+      ['Plan', 'Pending sync'],
+      ['Entitlements', 'Pending sync'],
+      ['AI credits', 'Pending sync'],
+    ];
+
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden">
-          <div className="p-6 md:p-8">
-            <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Account control center</span>
-            <h2 className="text-2xl md:text-4xl font-black mt-2">Settings</h2>
-            <p className="text-sm text-white/55 mt-2 max-w-2xl">Keep your learning preferences, access state and session controls in one place. Account-changing actions will be connected to the appropriate backend services.</p>
-          </div>
-        </section>
+      <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-24">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-7 space-y-5">
+          <header className="flex items-end justify-between gap-4">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Settings</span>
+              <h1 className="text-[30px] md:text-4xl leading-tight tracking-[-0.04em] font-black mt-1">Make SABI work for you.</h1>
+              <p className="text-sm text-[#64748B] mt-2 max-w-xl leading-relaxed">
+                Control your learning preferences, account access and current session.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('profile')}
+              className="hidden md:inline-flex min-h-[42px] px-4 rounded-xl border border-[#DCE7F2] bg-white text-xs font-black"
+            >
+              Back to profile
+            </button>
+          </header>
 
-        <div className="grid lg:grid-cols-2 gap-5">
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#EBF4FF] flex items-center justify-center"><Sliders className="w-4 h-4 text-[#4A90D9]" /></div>
-              <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Learning</span><h3 className="text-base font-black text-[#0A1128]">Preferences</h3></div>
+          <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+            <div className="px-5 pt-5 pb-3">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Learning preferences</span>
+              <h2 className="text-lg font-black mt-1">How SABI teaches you</h2>
             </div>
-            <div className="mt-5 space-y-3">
-              <div className="rounded-2xl border border-[#D6E4F0] p-4">
-                <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">Language preference</span>
-                <p className="text-xs font-black text-[#0A1128] mt-1">{profile?.languagePreference || 'Not set'}</p>
-              </div>
-              <div className="rounded-2xl border border-[#D6E4F0] p-4">
-                <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">Explanation style</span>
-                <p className="text-xs font-black text-[#0A1128] mt-1">{profile?.explanationPreference || 'Not set'}</p>
-              </div>
-            </div>
-            <button type="button" disabled className="mt-4 w-full py-3 rounded-xl border border-slate-200 text-slate-400 text-xs font-black uppercase tracking-wider cursor-not-allowed">Edit preferences — API pending</button>
-          </section>
 
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#FFF8D8] flex items-center justify-center"><Lock className="w-4 h-4 text-[#0A1128]" /></div>
-              <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Commercial</span><h3 className="text-base font-black text-[#0A1128]">Access & billing</h3></div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-5">
-              {['Plan','Entitlements','AI credits'].map(label => (
-                <div key={label} className="rounded-xl bg-[#F8FBFF] border border-[#D6E4F0] p-3">
-                  <span className="block text-[8px] uppercase font-black text-slate-400">{label}</span>
-                  <p className="text-[10px] font-black text-[#0A1128] mt-1">Pending sync</p>
+            <div className="divide-y divide-[#EEF3F8]">
+              {preferenceRows.map(([label, value]) => (
+                <div key={label} className="px-5 py-4 flex items-center justify-between gap-5">
+                  <div className="min-w-0">
+                    <p className="text-xs font-black">{label}</p>
+                    <p className="text-[10px] text-[#64748B] mt-1 truncate max-w-[260px]">{value}</p>
+                  </div>
+                  <span className="shrink-0 text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">API pending</span>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-slate-500 mt-4 leading-relaxed">Payment status, subscription, entitlements and credit balances are authoritative server state.</p>
-            <button type="button" disabled className="mt-3 w-full py-3 rounded-xl border border-slate-200 text-slate-400 text-xs font-black uppercase tracking-wider cursor-not-allowed">Manage access — API pending</button>
-          </section>
-        </div>
 
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#F8FBFF] border border-[#D6E4F0] flex items-center justify-center"><ShieldAlert className="w-4 h-4 text-[#4A90D9]" /></div>
-            <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Session</span><h3 className="text-base font-black text-[#0A1128]">Security & recovery</h3></div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-3 mt-5">
-            <div className="rounded-2xl border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Authentication</span>
-              <p className="text-xs font-black text-[#0A1128] mt-1">Session service pending</p>
-              <p className="text-[10px] text-slate-500 mt-2">Production logout and session invalidation will be handled by the authentication service.</p>
+            <div className="px-5 pb-5">
+              <button
+                type="button"
+                disabled
+                className="w-full min-h-[48px] rounded-2xl border border-[#DCE7F2] bg-[#F8FAFC] text-[#94A3B8] text-xs font-black cursor-not-allowed"
+              >
+                Edit preferences
+              </button>
             </div>
-            <div className="rounded-2xl border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Frontend preview</span>
-              <p className="text-xs font-black text-[#0A1128] mt-1">Local state only</p>
-              <p className="text-[10px] text-slate-500 mt-2">Use this only to leave the current frontend preview while backend auth is not connected.</p>
+          </section>
+
+          <section className="rounded-[24px] bg-[#07152F] text-white overflow-hidden">
+            <div className="p-5 md:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">Account & access</span>
+                  <h2 className="text-lg font-black mt-1">What your account can use</h2>
+                </div>
+                <Lock className="w-4 h-4 text-white/35 mt-1 shrink-0" />
+              </div>
+
+              <div className="mt-5 divide-y divide-white/10 border-y border-white/10">
+                {accountRows.map(([label, value]) => (
+                  <div key={label} className="py-3.5 flex items-center justify-between gap-4">
+                    <span className="text-xs font-bold text-white/70">{label}</span>
+                    <span className="text-[9px] uppercase tracking-wider font-black text-white/40">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[10px] text-white/45 leading-relaxed mt-4">
+                Subscription, payment state, entitlements and AI credit balances are server-owned. This preview will never invent those values.
+              </p>
+
+              <button
+                type="button"
+                disabled
+                className="mt-4 w-full min-h-[48px] rounded-2xl bg-white/[0.06] border border-white/10 text-white/35 text-xs font-black cursor-not-allowed"
+              >
+                Manage access — API pending
+              </button>
             </div>
-          </div>
-          <button type="button" onClick={handleResetProfileSystem} className="mt-4 w-full md:w-auto px-5 py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-wider">Exit frontend preview</button>
-        </section>
+          </section>
+
+          <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+            <div className="px-5 pt-5 pb-3">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Security & session</span>
+              <h2 className="text-lg font-black mt-1">Stay in control</h2>
+            </div>
+
+            <div className="px-5 pb-5 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E7EEF7] p-4">
+                <span className="text-[8px] uppercase tracking-[0.16em] font-black text-[#94A3B8]">Authentication</span>
+                <p className="text-xs font-black mt-1">Session service pending</p>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-2">
+                  Production sign-out and session invalidation will be handled by the authentication service.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E7EEF7] p-4">
+                <span className="text-[8px] uppercase tracking-[0.16em] font-black text-[#94A3B8]">Current environment</span>
+                <p className="text-xs font-black mt-1">Frontend preview</p>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-2">
+                  Changes in this preview are local state until the account service is connected.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[24px] border border-rose-200 bg-rose-50/60 p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-4 h-4 text-rose-600" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-rose-500">Preview exit</span>
+                <h2 className="text-sm font-black mt-1 text-[#0B1220]">Leave this frontend preview</h2>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-1">
+                  This resets the current preview profile and returns to the starting account flow. It does not delete production account data.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResetProfileSystem}
+              className="mt-4 w-full min-h-[50px] rounded-2xl bg-[#0B1220] text-white text-xs font-black active:scale-[.99] transition"
+            >
+              Exit frontend preview
+            </button>
+          </section>
+
+          <p className="text-center text-[9px] text-[#94A3B8] leading-relaxed px-5">
+            SABI keeps authoritative account, access and learning-engine state on the server. This screen only presents what is currently available.
+          </p>
+        </div>
       </div>
     );
   }
