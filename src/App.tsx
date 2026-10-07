@@ -3043,32 +3043,32 @@ export default function App() {
   function renderProfileTab() {
     if (!profile) return null;
 
-    const initials = profile.name.trim().split(/\\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+    const initials = profile.name.trim().split(/\s+/).slice(0, 2).map(part => part[0]).join('').toUpperCase();
 
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden">
-          <div className="p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="rounded-[28px] bg-white border border-slate-200 p-5 md:p-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-xl font-black text-[#F5C518]">
+              <div className="h-16 w-16 md:h-20 md:w-20 rounded-[22px] bg-[#07152F] text-[#F5C518] flex items-center justify-center text-xl md:text-2xl font-black shrink-0">
                 {initials || 'S'}
               </div>
               <div>
-                <span className="text-[9px] uppercase tracking-[0.2em] font-black text-white/45">Student profile</span>
-                <h2 className="text-2xl md:text-3xl font-black mt-1">{profile.name}</h2>
-                <p className="text-xs text-white/55 mt-1">Your profile describes your learning context. Authoritative account state comes from the backend.</p>
+                <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#2563EB]">Your SABI profile</span>
+                <h2 className="text-2xl md:text-4xl font-black text-[#0B1220] mt-1">{profile.name}</h2>
+                <p className="text-xs md:text-sm text-slate-500 mt-2 max-w-xl">Your profile gives SABI the context it needs to make your preparation more relevant.</p>
               </div>
             </div>
-            <button type="button" onClick={() => setActiveTab('settings')} className="px-4 py-2.5 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black uppercase tracking-wider">
-              Account settings
+            <button type="button" onClick={() => setActiveTab('settings')} className="min-h-[46px] px-5 rounded-2xl bg-[#07152F] text-white text-[10px] font-black uppercase tracking-wider">
+              Manage account
             </button>
           </div>
         </section>
 
-        <div className="grid lg:grid-cols-[1.2fr_.8fr] gap-5">
-          <section className="sabi-surface p-5 md:p-6">
-            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Your learning profile</span>
-            <h3 className="text-lg font-black text-[#0A1128] mt-1">Personalized context</h3>
+        <div className="grid lg:grid-cols-[1.15fr_.85fr] gap-4">
+          <section className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-7">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Learning context</span>
+            <h3 className="text-xl font-black text-[#0B1220] mt-1">Who SABI is preparing for</h3>
             <div className="grid sm:grid-cols-2 gap-3 mt-5">
               {[
                 ['Target course', profile.targetCourse || 'Not set'],
@@ -3078,26 +3078,28 @@ export default function App() {
                 ['Explanation style', profile.explanationPreference || 'Not set'],
                 ['Study history', profile.attempts || 'Not set']
               ].map(([label, value]) => (
-                <div key={label} className="rounded-2xl border border-[#D6E4F0] bg-[#F8FBFF] p-4">
-                  <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">{label}</span>
-                  <p className="text-xs font-black text-[#0A1128] mt-1 leading-relaxed">{String(value)}</p>
+                <div key={label} className="rounded-2xl bg-[#F8FAFC] border border-slate-200 p-4">
+                  <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-slate-400">{label}</span>
+                  <p className="text-xs font-black text-[#0B1220] mt-1 leading-relaxed">{String(value)}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="space-y-5">
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Chosen subjects</span>
-              <div className="flex flex-wrap gap-2 mt-3">
-                {(profile.chosenSubjects || []).map(subject => (
-                  <span key={subject} className="px-3 py-1.5 rounded-full bg-[#EBF4FF] border border-[#D6E4F0] text-[10px] font-black text-[#0A1128]">{subject}</span>
-                ))}
+          <div className="space-y-4">
+            <section className="rounded-[24px] bg-[#07152F] text-white p-5 md:p-6">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">Your JAMB subjects</span>
+              <div className="mt-4 space-y-2">
+                {(profile.chosenSubjects || []).length ? (profile.chosenSubjects || []).map((subject, index) => (
+                  <div key={subject} className="flex items-center gap-3 rounded-2xl bg-white/[0.06] border border-white/10 px-4 py-3">
+                    <span className="h-7 w-7 rounded-lg bg-white/10 flex items-center justify-center text-[9px] font-black text-[#F5C518]">{String(index + 1).padStart(2, '0')}</span>
+                    <span className="text-xs font-black">{subject}</span>
+                  </div>
+                )) : <p className="text-xs text-white/50">Subject selection will appear after onboarding sync.</p>}
               </div>
-              {!(profile.chosenSubjects || []).length && <p className="text-xs text-slate-500 mt-3">Subject selection will appear after onboarding sync.</p>}
-            </div>
+            </section>
 
-            <div className="sabi-surface p-5">
+            <section className="rounded-[24px] bg-[#F8FAFC] border border-slate-200 p-5">
               <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Account state</span>
               <div className="mt-3 space-y-2">
                 {[
@@ -3105,24 +3107,24 @@ export default function App() {
                   ['AI credits', 'Backend sync pending'],
                   ['Streak', 'Backend sync pending']
                 ].map(([label, value]) => (
-                  <div key={label} className="flex items-center justify-between gap-3 py-2 border-b last:border-0 border-slate-100">
+                  <div key={label} className="flex items-center justify-between gap-3 py-2.5 border-b last:border-0 border-slate-200">
                     <span className="text-[10px] font-bold text-slate-500">{label}</span>
-                    <span className="text-[10px] font-black text-[#0A1128]">{value}</span>
+                    <span className="text-[10px] font-black text-[#0B1220]">{value}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
 
-        <section className="rounded-2xl border border-[#D6E4F0] bg-white p-5 md:p-6">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-[#4A90D9]" />
-            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#0A1128]">Account boundary</span>
+        <section className="rounded-[22px] border border-slate-200 bg-white p-5 md:p-6">
+          <div className="flex items-start gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[#EBF4FF] border border-[#D6E4F0] flex items-center justify-center shrink-0"><ShieldAlert className="w-4 h-4 text-[#2563EB]" /></div>
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Data boundary</span>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">Subscription, entitlements, payments, AI credits, streaks and other authoritative account metrics remain server state. SABI will show them when the account service supplies them.</p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-            Subscription, entitlements, payments, AI-credit balance, streaks and other authoritative account metrics are server state. This frontend never invents values for them.
-          </p>
         </section>
       </div>
     );
