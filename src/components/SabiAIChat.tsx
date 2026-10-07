@@ -146,186 +146,122 @@ export default function SabiAIChat({
   const isLatestModel = latestMessage && latestMessage.sender === 'model';
 
   return (
-    <div id="tutor-chat-screen" className="flex flex-col flex-1 h-full w-full bg-white border border-[#D6E4F0] rounded-2xl overflow-hidden shadow-sm relative min-h-0">
-      
-      {/* Sabi Tutor Header */}
-      <div className="p-3.5 border-b border-[#D6E4F0] bg-gradient-to-r from-[#0A1128] to-[#4A90D9] text-white flex justify-between items-center z-10 shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#F5C518] text-[#0A1128] flex items-center justify-center">
-            <Sparkles className="h-4 w-4" />
-          </div>
+    <div id="tutor-chat-screen" className="flex flex-col min-h-[620px] h-full w-full bg-[#F8FAFC] rounded-[28px] overflow-hidden border border-slate-200 relative">
+      <header className="bg-[#07152F] text-white px-5 py-5 md:px-7 md:py-6 shrink-0 relative overflow-hidden">
+        <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full bg-[#2563EB]/20 blur-2xl" />
+        <div className="relative flex items-start justify-between gap-4">
           <div>
-            <h4 className="text-xs font-bold font-display uppercase tracking-wide">Grounding RAG Coach</h4>
-            <p className="text-[9px] text-[#D6E4F0]/90">Dual-Pass Verified JAMB Syllabus Logic</p>
+            <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#F5C518]">AI Coach</span>
+            <h2 className="text-2xl md:text-3xl font-black mt-1">Let’s figure it out together.</h2>
+            <p className="text-xs md:text-sm text-white/55 mt-2 max-w-xl leading-relaxed">Ask about a JAMB concept, work through a difficult question, or ask SABI to test your understanding.</p>
+          </div>
+          <div className="hidden sm:flex h-10 w-10 rounded-2xl bg-white/10 border border-white/10 items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4 text-[#F5C518]" />
           </div>
         </div>
-        <div className="flex bg-white/20 p-1.5 rounded-lg border border-white/20">
-          <Sparkles className="h-4 w-4 text-[#F5C518]" />
-        </div>
+      </header>
+
+      <div className="px-4 md:px-6 py-3 bg-white border-b border-slate-200 flex gap-2 overflow-x-auto scrollbar-none shrink-0">
+        <button onClick={() => setActiveBottomSheet('subject')} className="shrink-0 rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-[#0B1220] flex items-center gap-1.5">
+          <BookOpen className="w-3 h-3 text-[#2563EB]" /> {chatSubject} <ChevronDown className="w-3 h-3 text-slate-400" />
+        </button>
+        <button onClick={() => setActiveBottomSheet('topic')} className="shrink-0 max-w-[220px] rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-[#0B1220] flex items-center gap-1.5">
+          <Sparkles className="w-3 h-3 text-[#F5C518]" /> <span className="truncate">{chatTopic}</span> <ChevronDown className="w-3 h-3 text-slate-400" />
+        </button>
       </div>
 
-      {/* ZONE 1: Context Bar (Top) with end-spacing content style */}
-      <div className="p-2.5 border-b border-indigo-50/50 bg-slate-50 flex gap-2 overflow-x-auto shrink-0 z-10 select-none scrollbar-none" style={{ paddingRight: 24 }}>
-        <button
-          onClick={() => setActiveBottomSheet('subject')}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-[#4A90D9] rounded-full text-[10px] font-black text-slate-700 uppercase tracking-wider transition shrink-0"
-        >
-          <BookOpen className="h-3 w-3 text-[#4A90D9]" />
-          <span>Subject: {chatSubject}</span>
-          <ChevronDown className="h-3 w-3 text-slate-400" />
-        </button>
-        <button
-          onClick={() => setActiveBottomSheet('topic')}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 hover:border-[#4A90D9] rounded-full text-[10px] font-black text-[#0A1128] uppercase tracking-wider transition shrink-0 max-w-[200px]"
-        >
-          <Sparkles className="h-3 w-3 text-[#F5C518]" />
-          <span className="truncate">Topic: {chatTopic}</span>
-          <ChevronDown className="h-3 w-3 text-slate-400" />
-        </button>
-        <div className="w-6 shrink-0" style={{ minWidth: 24 }} />
-      </div>
-
-      {/* ZONE 2 or ACTIVE CHAT STAGE (ZONE 3 & 4) */}
       {!isChatActive ? (
-        <div className="flex-1 p-4 flex flex-col justify-center items-center bg-[#F4F7FB]/40 overflow-y-auto z-10">
-          <div className="bg-white border border-[#D6E4F0] rounded-2xl p-5 w-full max-w-sm shadow-md space-y-4 animate-fade-in relative overflow-hidden bg-gradient-to-br from-white to-[#F8FBFF]">
-            <div className="absolute top-0 right-0 transform translate-x-3 -translate-y-3 w-24 h-24 bg-sky-50/40 rounded-full filter blur-xl pointer-events-none" />
-            
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#EBF1FA] text-[#4A90D9] flex items-center justify-center border border-[#D0E1F9]">
-                <Sparkles className="h-4.5 w-4.5 text-[#4A90D9]" />
-              </div>
-              <div>
-                <h4 className="text-xs font-black text-[#0A1128] uppercase tracking-wider">
-                  Hello {profile?.name?.trim().split(' ')[0] || 'Student'}!
-                </h4>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Your Personalized Sabi Coach</p>
-              </div>
-            </div>
+        <div className="flex-1 p-4 md:p-7 flex items-center justify-center overflow-y-auto">
+          <div className="w-full max-w-2xl">
+            <div className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-7">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Start a coaching session</span>
+              <h3 className="text-xl md:text-2xl font-black text-[#0B1220] mt-2">What are you trying to understand?</h3>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">{performanceText}</p>
 
-            <div className="space-y-2">
-              <p className="text-xs text-slate-650 font-bold leading-normal text-[#0A1128]">
-                {performanceText}
-              </p>
-              <p className="text-[11px] text-slate-500 leading-relaxed">
-                I am your syllabus boundaries buddy. Pick your focus topic above or let me guide you through the next best concept!
-              </p>
-            </div>
+              <div className="grid md:grid-cols-3 gap-2 mt-6">
+                {[
+                  ['Explain it', 'Walk me through the method'],
+                  ['Test me', 'Test me on this topic'],
+                  ['Simplify it', 'Simplify this explanation']
+                ].map(([label, prompt]) => (
+                  <button
+                    key={label}
+                    onClick={() => { setIsChatActive(true); handleSend(prompt); }}
+                    disabled={!isOnline}
+                    className="text-left rounded-2xl border border-slate-200 bg-[#F8FAFC] p-4 hover:border-[#2563EB]/50 hover:-translate-y-0.5 transition-all disabled:opacity-40"
+                  >
+                    <span className="block text-xs font-black text-[#0B1220]">{label}</span>
+                    <span className="block text-[10px] text-slate-500 mt-1 leading-relaxed">{prompt}</span>
+                  </button>
+                ))}
+              </div>
 
-            <div className="pt-2 space-y-2">
-              <span className="text-[8.5px] font-bold text-slate-405 uppercase tracking-wider block">Quick study starters:</span>
-              <button
-                onClick={() => {
-                  setIsChatActive(true);
-                  handleSend("Walk me through the method");
-                }}
-                disabled={!isOnline}
-                className="w-full text-left p-2.5 rounded-xl border border-slate-100 hover:border-[#4A90D9]/50 hover:bg-slate-50 text-slate-700 hover:text-[#0A1128] transition font-extrabold text-[11px] flex justify-between items-center disabled:opacity-40 disabled:pointer-events-none"
-              >
-                <span>📖 Walk me through the method</span>
-                <ChevronRight className="h-3.5 w-3.5 text-slate-450" />
-              </button>
-              <button
-                onClick={() => {
-                  setIsChatActive(true);
-                  handleSend("I have a specific question");
-                }}
-                disabled={!isOnline}
-                className="w-full text-left p-2.5 rounded-xl border border-slate-100 hover:border-[#4A90D9]/50 hover:bg-slate-50 text-slate-700 hover:text-[#0A1128] transition font-extrabold text-[11px] flex justify-between items-center disabled:opacity-40 disabled:pointer-events-none"
-              >
-                <span>✍️ I have a specific question</span>
-                <ChevronRight className="h-3.5 w-3.5 text-slate-450" />
-              </button>
+              {!isOnline && (
+                <div className="mt-4 rounded-2xl bg-rose-50 border border-rose-100 p-3 flex gap-2 items-center text-[10px] font-bold text-rose-700">
+                  <AlertCircle className="w-4 h-4 shrink-0" /> AI Coach requires an internet connection. Practice remains available.
+                </div>
+              )}
             </div>
           </div>
         </div>
       ) : (
         <>
-          {/* ZONE 3: Chat Messages thread list viewport */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#f8f9fc]/30 scrollbar-none z-10 min-h-0 flex flex-col">
-            <div className="space-y-3 flex-1">
-              {messages.map((m) => (
-                <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                  <div className={`p-3 rounded-2xl max-w-[85%] text-[11px] leading-relaxed shadow-sm border ${m.sender === 'user' ? 'bg-[#0A1128] text-white border-[#0A1128] rounded-br-[2px]' : 'bg-white text-slate-800 border-[#D6E4F0] rounded-bl-[2px]'}`}>
-                    {m.sender === 'model' && (
-                      <span className="block text-[8px] uppercase tracking-wider font-extrabold text-[#4A90D9] mb-1">
-                        Sabi AI Coach
-                      </span>
-                    )}
-                    <div className="leading-relaxed font-sans text-[11px] overflow-x-hidden">
-                      <MathText text={m.text} />
-                    </div>
+          <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-3 min-h-0">
+            {messages.map((m) => (
+              <div key={m.id} className={`flex ${m.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                <div className={`max-w-[88%] md:max-w-[75%] rounded-[20px] px-4 py-3 border shadow-sm ${m.sender === 'user' ? 'bg-[#07152F] text-white border-[#07152F] rounded-br-md' : 'bg-white text-[#0B1220] border-slate-200 rounded-bl-md'}`}>
+                  {m.sender === 'model' && <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-[#2563EB] mb-1">SABI AI Coach</span>}
+                  <div className="text-xs leading-relaxed"><MathText text={m.text} /></div>
+                </div>
+              </div>
+            ))}
+
+            {loading && (
+              <div className="flex justify-start">
+                <div className="rounded-[20px] bg-white border border-slate-200 px-4 py-3 shadow-sm">
+                  <span className="block text-[8px] uppercase tracking-[0.16em] font-black text-[#2563EB] mb-2">SABI AI Coach</span>
+                  <div className="flex gap-1.5 items-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-bounce" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-bounce" style={{animationDelay:'120ms'}} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB] animate-bounce" style={{animationDelay:'240ms'}} />
+                    <span className="text-[10px] text-slate-400 ml-1">Thinking…</span>
                   </div>
                 </div>
-              ))}
+              </div>
+            )}
 
-              {loading && (
-                <div className="flex justify-start animate-pulse-slow">
-                  <div className="bg-white border border-[#D6E4F0] p-3 rounded-2xl rounded-bl-[2px] shadow-sm flex flex-col gap-1.5">
-                    <span className="text-[8px] uppercase tracking-wider font-extrabold text-[#4A90D9]">
-                      Sabi AI Coach
-                    </span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1.5 px-0.5 py-1">
-                        <div className="w-1.5 h-1.5 bg-[#4A90D9] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <div className="w-1.5 h-1.5 bg-[#4A90D9] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <div className="w-1.5 h-1.5 bg-[#4A90D9] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                      <span className="text-[10px] text-slate-550 font-bold">Concept retrieval matches...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {isLatestModel && !loading && (
-                <div className="flex flex-wrap gap-1.5 mt-2 ml-1 animate-fade-in pb-1 select-none">
-                  {['Show me an example', 'Test me on this topic', 'Simplify this explanation'].map((chip) => (
-                    <button
-                      key={chip}
-                      onClick={() => handleSend(chip)}
-                      className="px-2.5 py-1.5 bg-[#EBF1FA] text-[#0A1128] hover:bg-[#4A90D9]/10 border border-[#D0E1F9] hover:border-[#4A90D9] rounded-xl text-[10px] font-extrabold transition shadow-sm shrink-0"
-                    >
-                      ✨ {chip}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            {isLatestModel && !loading && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {['Show me an example', 'Test me on this topic', 'Simplify this explanation'].map(chip => (
+                  <button key={chip} onClick={() => handleSend(chip)} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-[10px] font-black text-[#0B1220] hover:border-[#2563EB] transition">
+                    {chip}
+                  </button>
+                ))}
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* ZONE 4: Network Aware Input Bar (Bottom) */}
-          <div className="flex-shrink-0 z-10 border-t border-[#D6E4F0] bg-white">
-            {!isOnline && (
-              <div className="bg-red-50 border-b border-red-100 px-4 py-2 flex items-center gap-2 text-[10px] text-red-650 animate-fade-in font-extrabold uppercase tracking-wide">
-                <AlertCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
-                <span>Tutor requires internet. Practice is still available offline.</span>
-              </div>
-            )}
-            
-            <div className="p-2 flex gap-2 items-center">
+          <div className="border-t border-slate-200 bg-white p-3 md:p-4 shrink-0">
+            {!isOnline && <div className="mb-2 rounded-xl bg-rose-50 border border-rose-100 px-3 py-2 text-[10px] font-bold text-rose-700">Tutor requires internet. Practice is still available offline.</div>}
+            <div className="flex gap-2">
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
-                placeholder={isOnline ? `Ask Sabi AI about ${chatTopic}...` : `Tutor requires internet. Practice is still available offline.`}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
+                placeholder={isOnline ? `Ask about ${chatTopic}…` : 'AI Coach requires internet'}
                 disabled={!isOnline}
-                className={`flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#4A90D9] font-bold ${!isOnline ? 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-150' : 'bg-slate-50/50 text-slate-800'}`}
+                className="min-h-[50px] flex-1 rounded-2xl border border-slate-200 bg-[#F8FAFC] px-4 text-sm font-medium outline-none focus:border-[#2563EB]"
               />
-              {isOnline && (
-                <button
-                  onClick={() => handleSend()}
-                  disabled={loading || !input.trim()}
-                  className="p-2 rounded-xl bg-[#0A1128] text-[#F5C518] hover:bg-[#040814] transition shadow-sm disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
-                >
-                  <Send className="h-3.5 w-3.5 animate-pulse-slow" />
-                </button>
-              )}
+              <button onClick={() => handleSend()} disabled={loading || !input.trim() || !isOnline} className="min-w-[50px] rounded-2xl bg-[#07152F] text-[#F5C518] flex items-center justify-center disabled:opacity-40">
+                <Send className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </>
-      )}
+      )
+
 
       {/* Interactive Bottom Sheet Select Drawer */}
       {activeBottomSheet && (
