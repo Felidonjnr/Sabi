@@ -2547,176 +2547,92 @@ export default function App() {
     };
 
     const resetCbtPreview = () => {
-      setCbtPreviewConfig(null);
-      setCbtPreviewQuestions([]);
-      setCbtPreviewAnswers({});
-      setCbtPreviewFlagged({});
-      setCbtPreviewSubmitted(false);
-      setCbtPreviewIndex(0);
-      setCbtPreviewStartedAt(null);
-      setCbtPreviewTimeLeft(0);
-      setCbtPreviewConfirmSubmit(false);
+      setCbtPreviewConfig(null); setCbtPreviewQuestions([]); setCbtPreviewAnswers({});
+      setCbtPreviewFlagged({}); setCbtPreviewSubmitted(false); setCbtPreviewIndex(0);
+      setCbtPreviewStartedAt(null); setCbtPreviewTimeLeft(0); setCbtPreviewConfirmSubmit(false);
     };
 
-    const submitCbtPreview = () => {
-      setCbtPreviewConfirmSubmit(false);
-      setCbtPreviewSubmitted(true);
-    };
+    const submitCbtPreview = () => { setCbtPreviewConfirmSubmit(false); setCbtPreviewSubmitted(true); };
 
-    if (cbtPreviewConfig && !cbtPreviewSubmitted && cbtPreviewQuestions.length > 0) {
-      const selectedAnswer = currentQuestion ? cbtPreviewAnswers[currentQuestion.id] : undefined;
-      const progressPercent = cbtPreviewQuestions.length ? ((cbtPreviewIndex + 1) / cbtPreviewQuestions.length) * 100 : 0;
-      const isFlagged = currentQuestion ? Boolean(cbtPreviewFlagged[currentQuestion.id]) : false;
+    if (cbtPreviewConfig && !cbtPreviewSubmitted && cbtPreviewQuestions.length > 0 && currentQuestion) {
+      const selectedAnswer = cbtPreviewAnswers[currentQuestion.id];
+      const progressPercent = ((cbtPreviewIndex + 1) / cbtPreviewQuestions.length) * 100;
+      const isFlagged = Boolean(cbtPreviewFlagged[currentQuestion.id]);
       const isLowTime = cbtPreviewTimeLeft > 0 && cbtPreviewTimeLeft <= 300;
 
       return (
-        <div className="animate-fade-in -mx-1">
+        <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
           {cbtPreviewConfirmSubmit && (
-            <div className="fixed inset-0 z-[80] bg-[#0A1128]/70 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6">
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Submit exam preview?</span>
-                <h3 className="text-xl font-black text-[#0A1128] mt-2">Finish this CBT session?</h3>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                  You have answered {answeredCount} of {cbtPreviewQuestions.length} preview questions. Unanswered questions remain blank.
-                </p>
+            <div className="fixed inset-0 z-[90] bg-[#07152F]/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
+              <div className="w-full max-w-sm rounded-[28px] bg-white text-[#0B1220] p-5 shadow-2xl">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Submit exam</span>
+                <h3 className="text-xl font-black mt-2">Finish this mock?</h3>
+                <p className="text-sm text-[#64748B] mt-2 leading-relaxed">You have answered {answeredCount} of {cbtPreviewQuestions.length}. Unanswered questions will remain blank in this preview.</p>
                 <div className="grid grid-cols-2 gap-2 mt-5">
-                  <button type="button" onClick={() => setCbtPreviewConfirmSubmit(false)} className="py-3 rounded-xl border border-slate-200 text-xs font-black text-slate-600">Keep Working</button>
-                  <button type="button" onClick={submitCbtPreview} className="py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black">Submit Preview</button>
+                  <button type="button" onClick={() => setCbtPreviewConfirmSubmit(false)} className="min-h-[50px] rounded-2xl border border-[#DCE7F2] font-black text-sm">Keep working</button>
+                  <button type="button" onClick={submitCbtPreview} className="min-h-[50px] rounded-2xl bg-[#2563EB] text-white font-black text-sm">Submit mock</button>
                 </div>
               </div>
             </div>
           )}
 
-          <header className="rounded-3xl bg-[#0A1128] text-white overflow-hidden shadow-sm">
-            <div className="p-4 md:p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={resetCbtPreview} className="h-9 w-9 rounded-xl bg-white/10 hover:bg-white/15 flex items-center justify-center" aria-label="Exit CBT preview">
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <div>
-                    <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">SABI CBT</span>
-                    <h2 className="text-sm md:text-base font-black mt-0.5">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'} <span className="text-white/35 font-medium">• UI Preview</span></h2>
-                  </div>
-                </div>
-                <div className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${isLowTime ? 'bg-rose-500/15 border-rose-400/40 text-rose-200' : 'bg-white/10 border-white/10 text-white'}`}>
-                  <Clock className="w-4 h-4" />
-                  <span className="font-mono font-black text-sm">{formatTime(cbtPreviewTimeLeft)}</span>
-                  <span className="text-[8px] uppercase tracking-wider font-black opacity-60">preview clock</span>
-                </div>
+          <div className="max-w-xl mx-auto px-4 pt-4">
+            <header className="flex items-center justify-between gap-3">
+              <button type="button" onClick={resetCbtPreview} className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center" aria-label="Exit CBT"><ChevronLeft className="w-4 h-4" /></button>
+              <div className="text-center min-w-0">
+                <span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Exam Room</span>
+                <span className="block text-xs font-black mt-1 truncate">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'}</span>
               </div>
-              <div className="mt-5 flex items-center justify-between gap-3 text-[9px] font-black uppercase tracking-wider text-white/50">
-                <span>Question {cbtPreviewIndex + 1} of {cbtPreviewQuestions.length}</span>
-                <span>{answeredCount} answered • {flaggedCount} flagged</span>
+              <div className={`px-3 py-2 rounded-2xl border flex items-center gap-2 ${isLowTime ? 'bg-rose-500/15 border-rose-400/40 text-rose-200' : 'bg-white/[0.06] border-white/10 text-white'}`}>
+                <Clock className="w-4 h-4" /><span className="font-mono font-black text-xs">{formatTime(cbtPreviewTimeLeft)}</span>
               </div>
-              <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-[#F5C518] rounded-full transition-all duration-300" style={{ width: `${progressPercent}%` }} />
-              </div>
+            </header>
+
+            <div className="mt-5">
+              <div className="flex items-center justify-between text-[9px] uppercase tracking-wider font-black text-white/40"><span>Question {cbtPreviewIndex + 1} of {cbtPreviewQuestions.length}</span><span>{answeredCount} answered</span></div>
+              <div className="mt-2 h-1.5 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full bg-[#F5C518] transition-all" style={{ width: `${progressPercent}%` }} /></div>
             </div>
-          </header>
 
-          <div className="grid lg:grid-cols-[220px_1fr] gap-4 mt-4">
-            <aside className="order-2 lg:order-1 rounded-3xl border border-[#D6E4F0] bg-white p-4 h-fit lg:sticky lg:top-4">
-              <button type="button" onClick={() => setCbtPreviewShowNavigator(v => !v)} className="w-full flex items-center justify-between text-left">
-                <div>
-                  <span className="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400">Exam navigator</span>
-                  <p className="text-xs font-black text-[#0A1128] mt-1">{answeredCount} answered</p>
-                </div>
-                <ChevronRight className={`w-4 h-4 text-slate-400 transition ${cbtPreviewShowNavigator ? 'rotate-90' : ''}`} />
-              </button>
+            <button type="button" onClick={() => setCbtPreviewShowNavigator(v => !v)} className="w-full mt-4 rounded-2xl border border-white/10 bg-white/[0.045] px-4 py-3 flex items-center justify-between">
+              <span className="text-xs font-black">Question navigator</span>
+              <span className="text-[9px] font-black uppercase tracking-wider text-white/40">{flaggedCount} flagged <ChevronRight className={`w-4 h-4 inline-block ml-1 transition ${cbtPreviewShowNavigator ? 'rotate-90' : ''}`} /></span>
+            </button>
 
-              {cbtPreviewShowNavigator && (
-                <>
-                  <div className="grid grid-cols-5 gap-2 mt-4 max-h-[310px] overflow-y-auto pr-1">
-                    {cbtPreviewQuestions.map((q, index) => {
-                      const answered = Boolean(cbtPreviewAnswers[q.id]);
-                      const flagged = Boolean(cbtPreviewFlagged[q.id]);
-                      const active = index === cbtPreviewIndex;
-                      return (
-                        <button
-                          key={q.id}
-                          type="button"
-                          onClick={() => setCbtPreviewIndex(index)}
-                          aria-label={`Go to question ${index + 1}`}
-                          className={`relative h-8 rounded-lg border text-[9px] font-black transition ${
-                            active ? 'bg-[#0A1128] text-white border-[#0A1128]' :
-                            answered ? 'bg-[#EEF6FF] text-[#1B3A7A] border-[#B9D7F3]' :
-                            'bg-white text-slate-500 border-slate-200 hover:border-[#4A90D9]'
-                          }`}
-                        >
-                          {index + 1}
-                          {flagged && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border border-white" />}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div className="space-y-2 mt-4 pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded bg-[#0A1128]" /> Current</div>
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded bg-[#EEF6FF] border border-[#B9D7F3]" /> Answered</div>
-                    <div className="flex items-center gap-2 text-[9px] text-slate-500"><span className="w-3 h-3 rounded-full bg-[#F5C518]" /> Flagged</div>
-                  </div>
-                </>
-              )}
-            </aside>
-
-            <main className="order-1 lg:order-2 rounded-3xl border border-[#D6E4F0] bg-white shadow-sm overflow-hidden">
-              <div className="p-5 md:p-7">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-                  <div>
-                    <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black uppercase tracking-wider text-slate-500">{currentQuestion?.subject}</span>
-                    <p className="text-[10px] text-slate-400 mt-2">{currentQuestion?.topic} • {currentQuestion?.year} • {currentQuestion?.difficulty}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => currentQuestion && setCbtPreviewFlagged(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))}
-                    className={`px-3 py-2 rounded-xl border text-[10px] font-black uppercase tracking-wider flex items-center gap-2 transition ${
-                      isFlagged ? 'bg-[#FFF8D8] border-[#F5C518] text-[#7A5B00]' : 'bg-white border-slate-200 text-slate-500 hover:border-[#4A90D9]'
-                    }`}
-                  >
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#F5C518]" />
-                    {isFlagged ? 'Flagged' : 'Flag for review'}
-                  </button>
-                </div>
-
-                <div className="text-base md:text-xl font-bold text-[#0A1128] leading-[1.8]">
-                  <MathText text={currentQuestion?.question || ''} />
-                </div>
-
-                <div className="grid gap-2.5 mt-8">
-                  {(['A', 'B', 'C', 'D'] as const).map(option => {
-                    const selected = selectedAnswer === option;
-                    return (
-                      <button
-                        key={option}
-                        type="button"
-                        onClick={() => currentQuestion && setCbtPreviewAnswers(prev => ({ ...prev, [currentQuestion.id]: option }))}
-                        className={`w-full text-left p-4 md:p-4.5 rounded-2xl border-2 transition flex items-start gap-3 ${
-                          selected ? 'border-[#4A90D9] bg-[#EEF6FF] text-[#0A1128] shadow-sm' : 'border-slate-200 bg-white hover:border-[#4A90D9]/60 hover:bg-[#F8FBFF]'
-                        }`}
-                      >
-                        <span className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-[10px] font-black border ${selected ? 'bg-[#0A1128] text-[#F5C518] border-[#0A1128]' : 'bg-slate-50 text-slate-500 border-slate-200'}`}>{option}</span>
-                        <span className="text-sm leading-relaxed pt-1"><MathText text={currentQuestion?.options[option] || ''} /></span>
-                      </button>
-                    );
+            {cbtPreviewShowNavigator && (
+              <div className="mt-2 rounded-2xl border border-white/10 bg-white/[0.045] p-3">
+                <div className="grid grid-cols-8 gap-1.5 max-h-40 overflow-y-auto">
+                  {cbtPreviewQuestions.map((q, index) => {
+                    const answered = Boolean(cbtPreviewAnswers[q.id]); const flagged = Boolean(cbtPreviewFlagged[q.id]);
+                    return <button key={q.id} type="button" onClick={() => setCbtPreviewIndex(index)} className={`relative h-8 rounded-lg text-[9px] font-black border ${index === cbtPreviewIndex ? 'bg-[#F5C518] text-[#07152F] border-[#F5C518]' : answered ? 'bg-white/10 text-white border-white/10' : 'bg-transparent text-white/40 border-white/10'}`}>{index + 1}{flagged && <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F5C518] border border-[#07152F]" />}</button>;
                   })}
                 </div>
+              </div>
+            )}
 
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-8 pt-5 border-t border-slate-100">
-                  <button type="button" disabled={cbtPreviewIndex === 0} onClick={() => setCbtPreviewIndex(i => Math.max(0, i - 1))} className="px-4 py-3 rounded-xl border border-slate-200 text-xs font-black text-slate-600 disabled:opacity-35">Previous</button>
-                  <div className="flex gap-2">
-                    {cbtPreviewIndex < cbtPreviewQuestions.length - 1 && (
-                      <button type="button" onClick={() => setCbtPreviewIndex(i => i + 1)} className="px-5 py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black">Next Question</button>
-                    )}
-                    <button type="button" onClick={() => setCbtPreviewConfirmSubmit(true)} className="px-5 py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-xs font-black">
-                      Submit Exam
-                    </button>
-                  </div>
+            <main className="mt-4 rounded-[28px] bg-white text-[#0B1220] overflow-hidden shadow-2xl">
+              <div className="p-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0"><span className="inline-flex px-2.5 py-1 rounded-full bg-[#EEF6FF] text-[#1D4ED8] text-[9px] font-black uppercase tracking-wider">{currentQuestion.subject}</span><p className="text-[10px] text-[#94A3B8] mt-2 truncate">{currentQuestion.topic} · {currentQuestion.year} · {currentQuestion.difficulty}</p></div>
+                  <button type="button" onClick={() => setCbtPreviewFlagged(prev => ({ ...prev, [currentQuestion.id]: !prev[currentQuestion.id] }))} className={`shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center ${isFlagged ? 'bg-[#FFF8D8] border-[#F5C518]' : 'border-[#DCE7F2] bg-white'}`} aria-label={isFlagged ? 'Remove flag' : 'Flag question'}><span className="w-2.5 h-2.5 rounded-full bg-[#F5C518]" /></button>
+                </div>
+
+                <div className="mt-7 text-[18px] leading-[1.65] font-black tracking-[-0.02em]"><MathText text={currentQuestion.question} /></div>
+
+                <div className="grid gap-2.5 mt-7">
+                  {(['A','B','C','D'] as const).map(option => {
+                    const selected = selectedAnswer === option;
+                    return <button key={option} type="button" onClick={() => setCbtPreviewAnswers(prev => ({ ...prev, [currentQuestion.id]: option }))} className={`w-full min-h-[58px] text-left px-3.5 py-3 rounded-2xl border-2 flex items-center gap-3 transition active:scale-[0.99] ${selected ? 'border-[#2563EB] bg-[#EEF6FF]' : 'border-[#E2E8F0] bg-white'}`}><span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${selected ? 'bg-[#07152F] text-[#F5C518]' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{option}</span><span className="text-sm font-bold leading-relaxed"><MathText text={currentQuestion.options[option]} /></span></button>;
+                  })}
                 </div>
               </div>
-              <div className="px-5 md:px-7 py-3 bg-[#F8FAFC] border-t border-slate-100">
-                <p className="text-[9px] text-slate-500 leading-relaxed"><strong className="text-[#0A1128]">Preview boundary:</strong> the navigator, flag state and clock are local UI simulation. Production CBT must own question order, authoritative timer, autosave, expiry, submission, scoring and recovery.</p>
+
+              <div className="px-5 py-4 bg-[#F8FAFC] border-t border-slate-100 flex gap-2">
+                <button type="button" disabled={cbtPreviewIndex === 0} onClick={() => setCbtPreviewIndex(i => Math.max(0, i - 1))} className="min-h-[50px] px-4 rounded-2xl border border-[#DCE7F2] bg-white text-xs font-black disabled:opacity-35">Previous</button>
+                <button type="button" onClick={() => cbtPreviewIndex < cbtPreviewQuestions.length - 1 ? setCbtPreviewIndex(i => i + 1) : setCbtPreviewConfirmSubmit(true)} className="flex-1 min-h-[50px] rounded-2xl bg-[#07152F] text-white text-sm font-black">{cbtPreviewIndex < cbtPreviewQuestions.length - 1 ? 'Next question' : 'Finish mock'}</button>
               </div>
             </main>
+
+            <p className="mt-3 px-1 text-[9px] text-white/35 leading-relaxed"><strong className="text-white/55">Preview boundary:</strong> timer, question order, autosave, expiry, submission, scoring and recovery become backend-authoritative in production.</p>
           </div>
         </div>
       );
@@ -2726,57 +2642,17 @@ export default function App() {
       const answeredQuestions = cbtPreviewQuestions.filter(q => cbtPreviewAnswers[q.id]);
       const correctAnswers = answeredQuestions.filter(q => cbtPreviewAnswers[q.id] === q.answer).length;
       const unansweredCount = cbtPreviewQuestions.length - answeredQuestions.length;
+      const accuracy = answeredQuestions.length ? Math.round((correctAnswers / answeredQuestions.length) * 100) : 0;
 
       return (
-        <div className="space-y-4 animate-fade-in max-w-4xl mx-auto w-full">
-          <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-            <div className="absolute -right-12 -top-12 w-40 h-40 rounded-full bg-[#4A90D9]/20" />
-            <div className="relative">
-              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">CBT preview complete</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">Session submitted.</h2>
-              <p className="text-sm text-white/60 mt-2 max-w-2xl">This is a local interface result. It is not an official JAMB score and does not update your SABI learning record.</p>
-            </div>
-          </section>
-
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Answered</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{answeredQuestions.length}</p></div>
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Unanswered</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{unansweredCount}</p></div>
-            <div className="sabi-surface p-5"><span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Preview accuracy</span><p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{answeredQuestions.length ? Math.round((correctAnswers / answeredQuestions.length) * 100) : 0}%</p></div>
-          </div>
-
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <span className="text-[9px] uppercase tracking-wider font-black text-[#4A90D9]">Answer review</span>
-                <h3 className="text-lg font-black text-[#0A1128] mt-1">Question map</h3>
-              </div>
-              <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">{flaggedCount} flagged</span>
-            </div>
-            <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2 mt-5">
-              {cbtPreviewQuestions.map((q, index) => {
-                const answered = Boolean(cbtPreviewAnswers[q.id]);
-                const flagged = Boolean(cbtPreviewFlagged[q.id]);
-                const correct = answered && cbtPreviewAnswers[q.id] === q.answer;
-                return (
-                  <div key={q.id} className={`relative h-9 rounded-lg border flex items-center justify-center text-[9px] font-black ${correct ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : answered ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
-                    {index + 1}
-                    {flagged && <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#F5C518] border border-white" />}
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <div className="grid md:grid-cols-2 gap-3">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-              <div className="flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-amber-700" /><span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Backend boundary</span></div>
-              <p className="text-xs text-amber-800 mt-2 leading-relaxed">Official scoring, exam state, result persistence, readiness and learning updates belong to the backend exam service.</p>
-            </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next step</span>
-              <h4 className="text-sm font-black text-[#0A1128] mt-1">Return to exam setup.</h4>
-              <button type="button" onClick={resetCbtPreview} className="mt-4 w-full py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-wider">Back to CBT</button>
-            </div>
+        <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+          <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+            <header className="flex items-center justify-between"><button type="button" onClick={resetCbtPreview} className="w-10 h-10 rounded-full border border-[#DCE7F2] bg-white flex items-center justify-center"><ChevronLeft className="w-4 h-4" /></button><div className="text-center"><span className="block text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam submitted</span><span className="block text-[10px] text-[#64748B] mt-1">{cbtPreviewConfig.mode === 'full' ? 'Full Mock' : 'Quick Mock'}</span></div><div className="w-10 h-10" /></header>
+            <section className="rounded-[28px] bg-[#07152F] text-white p-6 overflow-hidden relative"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Preview result</span><h1 className="text-2xl font-black mt-2">Mock submitted.</h1><p className="text-sm text-white/60 mt-2 leading-relaxed">This is a UI simulation. It is not an official JAMB score and does not update SABI's authoritative learning record.</p></div></section>
+            <div className="grid grid-cols-3 gap-2"><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Answered</span><p className="text-xl font-black font-mono mt-1">{answeredQuestions.length}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Blank</span><p className="text-xl font-black font-mono mt-1">{unansweredCount}</p></div><div className="rounded-2xl bg-white border border-[#DCE7F2] p-3"><span className="text-[8px] uppercase tracking-wider font-black text-[#94A3B8]">Accuracy</span><p className="text-xl font-black font-mono mt-1">{accuracy}%</p></div></div>
+            <section className="rounded-[24px] bg-white border border-[#DCE7F2] p-5"><div className="flex items-center justify-between"><div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Answer map</span><h2 className="text-lg font-black mt-1">How the mock went</h2></div><span className="text-[9px] font-black uppercase tracking-wider text-[#94A3B8]">{flaggedCount} flagged</span></div><div className="grid grid-cols-8 gap-1.5 mt-5">{cbtPreviewQuestions.map((q,index) => { const answered=Boolean(cbtPreviewAnswers[q.id]); const correct=answered&&cbtPreviewAnswers[q.id]===q.answer; const flagged=Boolean(cbtPreviewFlagged[q.id]); return <div key={q.id} className={`relative h-8 rounded-lg border flex items-center justify-center text-[8px] font-black ${correct?'bg-emerald-50 border-emerald-200 text-emerald-700':answered?'bg-rose-50 border-rose-200 text-rose-700':'bg-slate-50 border-slate-200 text-slate-400'}`}>{index+1}{flagged&&<span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#F5C518] border border-white" />}</div>; })}</div></section>
+            <section className="rounded-[24px] border border-[#DCE7F2] bg-[#F4F8FD] p-5"><div className="flex items-start gap-3"><ShieldAlert className="w-4 h-4 text-[#64748B] mt-0.5" /><div><span className="text-[9px] uppercase tracking-wider font-black text-[#64748B]">Exam data boundary</span><p className="text-xs text-[#64748B] leading-relaxed mt-1">Official score, result persistence, readiness and learning updates belong to the backend exam service.</p></div></div></section>
+            <button type="button" onClick={resetCbtPreview} className="w-full min-h-[52px] rounded-2xl bg-[#2563EB] text-white text-sm font-black">Back to exam room</button>
           </div>
         </div>
       );
@@ -2787,75 +2663,30 @@ export default function App() {
       const duration = mode === 'full' ? 120 : 30;
       const questions = [...SEED_QUESTIONS].slice(0, Math.min(count, SEED_QUESTIONS.length));
       setCbtPreviewConfig({ mode, questionCount: count, durationMinutes: duration });
-      setCbtPreviewQuestions(questions);
-      setCbtPreviewIndex(0);
-      setCbtPreviewAnswers({});
-      setCbtPreviewFlagged({});
-      setCbtPreviewSubmitted(false);
-      setCbtPreviewConfirmSubmit(false);
-      setCbtPreviewStartedAt(Date.now());
-      setCbtPreviewTimeLeft(duration * 60);
+      setCbtPreviewQuestions(questions); setCbtPreviewIndex(0); setCbtPreviewAnswers({});
+      setCbtPreviewFlagged({}); setCbtPreviewSubmitted(false); setCbtPreviewConfirmSubmit(false);
+      setCbtPreviewStartedAt(Date.now()); setCbtPreviewTimeLeft(duration * 60);
     };
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-          <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-24 w-44 h-44 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-            <div>
-              <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Exam mode</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">CBT Simulator</h2>
-              <p className="text-sm text-white/65 mt-2 max-w-2xl leading-relaxed">A focused JAMB-style interface with a question navigator, review flags, exam clock and controlled submission flow.</p>
-            </div>
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 min-w-[210px]">
-              <span className="text-[9px] uppercase tracking-wider font-black text-white/40">Production contract</span>
-              <p className="text-xs font-black mt-1">Backend exam service required</p>
-              <p className="text-[10px] text-white/50 mt-1 leading-relaxed">This build validates the interface only.</p>
-            </div>
+      <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-8">
+        <div className="max-w-xl mx-auto px-4 pt-5 space-y-4">
+          <header><span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Exam Room</span><h1 className="text-[30px] leading-tight tracking-[-0.04em] font-black mt-1">Test yourself under pressure.</h1><p className="text-sm text-[#64748B] mt-2 leading-relaxed">Choose a mock, enter a focused exam environment, and practise making decisions under time pressure.</p></header>
+          <section className="rounded-[28px] bg-[#07152F] text-white p-6 relative overflow-hidden"><div className="absolute -right-16 -top-16 w-40 h-40 rounded-full bg-[#2563EB]/20" /><div className="relative"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">CBT simulator</span><h2 className="text-xl font-black mt-2">A separate room for exam conditions.</h2><p className="text-xs text-white/55 mt-2 leading-relaxed">The production exam service will own timing, state, autosave, submission and scoring. This build previews the experience.</p></div></section>
+          <div className="space-y-3">
+            {[{mode:'full' as const,label:'Full Mock',count:180,duration:'120 min',copy:'A complete-length exam environment.'},{mode:'quick' as const,label:'Quick Mock',count:40,duration:'30 min',copy:'A shorter simulation for focused practice.'}].map(item => (
+              <button key={item.mode} type="button" onClick={() => startPreview(item.mode)} className="w-full text-left rounded-[24px] bg-white border border-[#DCE7F2] p-5 active:scale-[0.99] transition">
+                <div className="flex items-start justify-between gap-4"><div><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">{item.label}</span><h3 className="text-xl font-black mt-1">{item.count} questions</h3><p className="text-xs font-black text-[#64748B] mt-1">{item.duration}</p><p className="text-xs text-[#64748B] leading-relaxed mt-3">{item.copy}</p></div><span className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center shrink-0"><ChevronRight className="w-4 h-4" /></span></div>
+                <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-wider text-[#94A3B8]"><span className="px-2 py-1 rounded-full bg-[#F8FAFC] border border-[#E2E8F0]">UI preview</span><span>Open exam room →</span></div>
+              </button>
+            ))}
           </div>
-        </section>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          {[
-            { mode: 'full' as const, label: 'Full Mock', count: 180, duration: '120 minutes', copy: 'Full production configuration for a complete mock examination.' },
-            { mode: 'quick' as const, label: 'Quick Mock', count: 40, duration: '30 minutes', copy: 'A shorter production configuration for focused exam simulation.' }
-          ].map(item => (
-            <button key={item.mode} type="button" onClick={() => startPreview(item.mode)} className="group text-left rounded-3xl border border-[#D6E4F0] bg-white p-6 shadow-sm hover:border-[#4A90D9] hover:shadow-md transition">
-              <div className="flex items-start justify-between gap-3">
-                <span className="w-10 h-10 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center"><FileText className="w-4 h-4 text-[#0A1128]" /></span>
-                <span className="px-2.5 py-1 rounded-full bg-[#F8FAFC] border border-slate-200 text-[8px] font-black uppercase tracking-wider text-slate-400">UI preview</span>
-              </div>
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9] block mt-5">{item.label}</span>
-              <h3 className="text-2xl font-black text-[#0A1128] mt-1">{item.count} questions</h3>
-              <p className="text-xs font-black text-slate-500 mt-1">{item.duration}</p>
-              <p className="text-sm text-slate-500 leading-relaxed mt-3">{item.copy}</p>
-              <span className="inline-flex items-center gap-1 mt-5 px-4 py-2.5 rounded-xl bg-[#0A1128] text-white text-[10px] font-black uppercase tracking-wider group-hover:bg-[#4A90D9] transition">Open UI Preview <ChevronRight className="w-3.5 h-3.5" /></span>
-            </button>
-          ))}
+          <section className="rounded-[24px] border border-[#DCE7F2] bg-white p-5"><span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#64748B]">What production CBT will own</span><div className="grid grid-cols-2 gap-2 mt-4">{['Authoritative timer','Autosave','Exam recovery','Submission receipt','Scoring','Result persistence'].map(item => <div key={item} className="rounded-xl bg-[#F8FAFC] border border-[#EEF3F8] p-3 text-[10px] font-black text-[#64748B]">{item}</div>)}</div></section>
         </div>
-
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div>
-              <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Production boundary</span>
-              <h3 className="text-sm font-black text-[#0A1128] mt-1">What will move to the exam service</h3>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Question order, authoritative countdown, autosave, expiry handling, submission receipt, scoring, result persistence and recovery must be supplied by the backend. The frontend is intentionally not pretending otherwise.</p>
-            </div>
-          </div>
-        </section>
       </div>
     );
   }
 
-  // --- SUB-PANE: DASHBOARD ADAPTIVE PRACTICE ---
-  const customPracticeSessionLabel = () => {
-    if (practiceSessionType !== 'custom') return 'Smart Practice preview';
-    return [customPracticeSubject, customPracticeTopic === 'All' ? 'All topics' : customPracticeTopic, customPracticeYear === 'All' ? 'Any past year' : customPracticeYear]
-      .filter(Boolean)
-      .join(' • ') || 'Custom Practice preview';
-  };
 
   function renderPracticeTab() {
     if (practiceSessionType === null) {
