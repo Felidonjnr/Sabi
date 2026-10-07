@@ -2130,95 +2130,71 @@ export default function App() {
     const isCorrect = hasAnswer && practiceSelectedAnswer === blitzQuestion.answer;
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        {/* Blitz hero */}
-        <div className="relative overflow-hidden rounded-3xl bg-[#0A1128] text-white p-5 md:p-7 shadow-lg">
-          <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-20 h-36 w-36 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+      <div className="min-h-full bg-[#07152F] text-white animate-fade-in pb-8">
+        <div className="max-w-xl mx-auto px-4 pt-5">
+          <header className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-xl bg-[#F5C518] text-[#0A1128]">
-                  <Zap className="h-4 w-4" />
-                </span>
-                <span className="text-[10px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Blitz</span>
-              </div>
-              <h2 className="text-2xl md:text-3xl font-black mt-3 tracking-tight">Fast practice. One question at a time.</h2>
-              <p className="text-sm text-slate-300 mt-2 max-w-2xl leading-relaxed">
-                Blitz is a focused rapid-practice mode. The learning engine will control question selection, session state and scoring when connected.
-              </p>
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Blitz</span>
+              <h1 className="text-[28px] leading-tight tracking-[-0.04em] font-black mt-1">Think fast.</h1>
             </div>
-            <div className="grid grid-cols-2 gap-2 md:min-w-[250px]">
-              <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
-                <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-400">Mode</span>
-                <span className="block text-sm font-black mt-1">Rapid practice</span>
-              </div>
-              <div className="rounded-2xl bg-white/10 border border-white/10 p-3">
-                <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-400">State</span>
-                <span className="block text-sm font-black mt-1">Preview</span>
-              </div>
+            <div className="w-10 h-10 rounded-2xl bg-white/[0.07] border border-white/10 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[#F5C518]" />
             </div>
-          </div>
-        </div>
+          </header>
 
-        {/* Session controls / evidence boundary */}
-        <div className="grid md:grid-cols-[1fr_auto] gap-3 items-stretch">
-          <div className="sabi-surface p-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full bg-[#EAF3FC] text-[#1B3A7A] text-[9px] uppercase tracking-wider font-black">Question 1</span>
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-black">{blitzQuestion.subject}</span>
-              <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[9px] uppercase tracking-wider font-black">{blitzQuestion.difficulty}</span>
-            </div>
-            <p className="text-xs text-slate-500 mt-3">
-              No frontend speed ranking or authoritative score is calculated here.
-            </p>
-          </div>
-          <button
-            onClick={() => {
-              setPracticeQuestions([]);
-              setPracticeSelectedAnswer(null);
-              setPracticeHasSubmitted(false);
-              setPracticeSessionType(null);
-            }}
-            className="px-4 py-3 rounded-2xl border border-[#D6E4F0] bg-white text-[#0A1128] font-black text-[10px] uppercase tracking-wider hover:border-[#4A90D9] transition"
-          >
-            Reset preview
-          </button>
-        </div>
-
-        {/* Question workspace */}
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_280px] gap-4 items-start">
-          <section className="sabi-surface overflow-hidden">
-            <div className="px-5 md:px-7 py-4 border-b border-[#D6E4F0] flex items-center justify-between gap-3">
+          <section className="mt-5 rounded-[28px] border border-white/10 bg-white/[0.045] p-5">
+            <div className="flex items-center justify-between gap-3">
               <div>
-                <span className="text-[9px] uppercase tracking-widest font-black text-[#4A90D9]">Question</span>
-                <h3 className="text-sm md:text-base font-black text-[#0A1128] mt-0.5">{blitzQuestion.topic}</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/40">Rapid practice</span>
+                <p className="text-sm font-black mt-1">One question. One decision.</p>
               </div>
-              <span className="text-[10px] font-bold text-slate-400">{blitzQuestion.year} • {blitzQuestion.exam_type}</span>
+              <span className="px-2.5 py-1 rounded-full bg-[#F5C518]/10 text-[#F5C518] text-[9px] font-black uppercase tracking-wider">Preview</span>
             </div>
+            <p className="text-xs text-white/55 leading-relaxed mt-3">
+              Blitz is built for quick repetitions. SABI's learning engine will control the sequence, session state and scoring in production.
+            </p>
+          </section>
 
-            <div className="p-5 md:p-7">
-              <div className="text-base md:text-lg font-bold leading-8 text-[#0A1128]">
+          <div className="mt-5 flex items-center justify-between">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="w-8 h-8 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-[10px] font-black shrink-0">1</span>
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-wider font-black text-white/40">Question</p>
+                <p className="text-xs font-black truncate">{blitzQuestion.subject} · {blitzQuestion.topic}</p>
+              </div>
+            </div>
+            <span className="text-[9px] font-black uppercase tracking-wider text-white/35">{blitzQuestion.difficulty}</span>
+          </div>
+
+          <main className="mt-4 rounded-[28px] bg-white text-[#0B1220] overflow-hidden shadow-2xl">
+            <div className="p-5">
+              <div className="flex items-center justify-between text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">
+                <span>{blitzQuestion.year} · {blitzQuestion.exam_type}</span>
+                <span>Rapid round</span>
+              </div>
+
+              <div className="mt-6 text-[18px] leading-[1.65] font-black tracking-[-0.015em]">
                 <MathText text={blitzQuestion.question} />
               </div>
 
-              <div className="grid gap-3 mt-7">
+              <div className="grid gap-2.5 mt-7">
                 {Object.entries(blitzQuestion.options).map(([key, value]) => {
                   const selected = practiceSelectedAnswer === key;
                   const correct = key === blitzQuestion.answer;
                   const resultClass = hasAnswer
                     ? correct
-                      ? 'border-[#15803D] bg-[#F0FDF4]'
+                      ? 'border-emerald-500 bg-emerald-50'
                       : selected
-                        ? 'border-[#B91C1C] bg-[#FEF2F2]'
-                        : 'border-slate-200 bg-white opacity-80'
+                        ? 'border-rose-500 bg-rose-50'
+                        : 'border-slate-200 bg-white opacity-55'
                     : selected
-                      ? 'border-[#4A90D9] bg-[#EAF3FC]'
-                      : 'border-slate-200 bg-white hover:border-[#4A90D9] hover:bg-[#F8FBFF]';
+                      ? 'border-[#2563EB] bg-[#EEF6FF]'
+                      : 'border-slate-200 bg-white active:scale-[0.99]';
 
                   return (
                     <button
                       key={key}
+                      type="button"
                       disabled={hasAnswer}
                       onClick={() => {
                         setPracticeQuestions([blitzQuestion]);
@@ -2226,66 +2202,63 @@ export default function App() {
                         setPracticeHasSubmitted(true);
                         setPracticeSessionType('smart');
                       }}
-                      className={`w-full text-left p-4 rounded-2xl border-2 transition flex items-start gap-3 ${resultClass}`}
+                      className={`w-full min-h-[58px] text-left px-3.5 py-3 rounded-2xl border-2 transition flex items-center gap-3 ${resultClass}`}
                     >
-                      <span className="w-9 h-9 shrink-0 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center text-xs font-black text-[#0A1128]">{key}</span>
-                      <span className="text-sm md:text-base text-slate-700 leading-relaxed pt-1"><MathText text={value as string} /></span>
-                      {hasAnswer && correct && <CheckCircle className="h-5 w-5 text-[#15803D] ml-auto shrink-0 mt-1" />}
-                      {hasAnswer && selected && !correct && <XCircle className="h-5 w-5 text-[#B91C1C] ml-auto shrink-0 mt-1" />}
+                      <span className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-black shrink-0 ${selected ? 'bg-[#2563EB] text-white' : 'bg-[#F1F5F9] text-[#64748B]'}`}>{key}</span>
+                      <span className="text-sm font-bold leading-relaxed flex-1"><MathText text={value as string} /></span>
+                      {hasAnswer && correct && <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />}
+                      {hasAnswer && selected && !correct && <XCircle className="w-5 h-5 text-rose-600 shrink-0" />}
                     </button>
                   );
                 })}
               </div>
 
               {hasAnswer && (
-                <div className={`mt-6 rounded-2xl border p-4 ${isCorrect ? 'border-[#BBF7D0] bg-[#F0FDF4]' : 'border-[#FECACA] bg-[#FEF2F2]'}`}>
+                <section className={`mt-5 rounded-2xl p-4 border ${isCorrect ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
                   <div className="flex items-center gap-2">
-                    {isCorrect ? <CheckCircle className="h-5 w-5 text-[#15803D]" /> : <Info className="h-5 w-5 text-[#B91C1C]" />}
-                    <span className={`text-sm font-black ${isCorrect ? 'text-[#166534]' : 'text-[#991B1B]'}`}>
-                      {isCorrect ? 'Answer recorded in preview' : 'Answer recorded in preview'}
-                    </span>
+                    {isCorrect ? <CheckCircle className="w-4 h-4 text-emerald-600" /> : <Info className="w-4 h-4 text-rose-600" />}
+                    <span className="text-sm font-black">{isCorrect ? 'Correct.' : 'Not quite.'}</span>
                   </div>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                    The authoritative result, mastery update and any XP/recommendation changes must come from the backend Blitz session.
+                  <p className="text-xs text-slate-600 leading-relaxed mt-2">
+                    <MathText text={blitzQuestion.explanation_short || blitzQuestion.explanation} />
                   </p>
-                  <div className="mt-3 pt-3 border-t border-black/5">
-                    <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Explanation preview</span>
-                    <p className="text-sm text-slate-700 mt-1 leading-relaxed">
-                      <MathText text={blitzQuestion.explanation_short || blitzQuestion.explanation} />
-                    </p>
-                  </div>
-                </div>
+                </section>
               )}
+            </div>
+
+            <div className="px-5 py-4 bg-[#F8FAFC] border-t border-slate-100">
+              <p className="text-[9px] text-[#64748B] leading-relaxed">
+                <strong className="text-[#0B1220]">Learning boundary:</strong> this preview does not create authoritative speed, XP, mastery, streak or JAMB-score data.
+              </p>
+            </div>
+          </main>
+
+          <section className="mt-4 rounded-[24px] border border-white/10 bg-white/[0.045] p-5">
+            <span className="text-[9px] uppercase tracking-[0.18em] font-black text-white/40">Why Blitz exists</span>
+            <div className="space-y-4 mt-4">
+              <div className="flex gap-3">
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">01</span>
+                <div><p className="text-xs font-black">Reduce hesitation.</p><p className="text-[10px] text-white/45 mt-1 leading-relaxed">Short, focused decisions keep you moving.</p></div>
+              </div>
+              <div className="flex gap-3">
+                <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[10px] font-black shrink-0">02</span>
+                <div><p className="text-xs font-black">Spot patterns.</p><p className="text-[10px] text-white/45 mt-1 leading-relaxed">Repeated exposure helps the learning engine understand where to take you next.</p></div>
+              </div>
             </div>
           </section>
 
-          {/* Blitz information rail */}
-          <aside className="space-y-3">
-            <div className="sabi-surface p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-[#4A90D9]">How Blitz works</span>
-              <div className="space-y-3 mt-4">
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#EAF3FC] text-[#1B3A7A] flex items-center justify-center text-xs font-black">1</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Receive a focused question</p><p className="text-[10px] text-slate-500 mt-0.5">Selection comes from SABI's learning engine.</p></div>
-                </div>
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#FFF8D8] text-[#8A6900] flex items-center justify-center text-xs font-black">2</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Answer quickly</p><p className="text-[10px] text-slate-500 mt-0.5">Stay focused without frontend speed scoring.</p></div>
-                </div>
-                <div className="flex gap-3">
-                  <span className="h-7 w-7 rounded-lg bg-[#F0FDF4] text-[#166534] flex items-center justify-center text-xs font-black">3</span>
-                  <div><p className="text-xs font-black text-[#0A1128]">Build learning evidence</p><p className="text-[10px] text-slate-500 mt-0.5">Backend services update mastery and recommendations.</p></div>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-[#F8FBFF] border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Backend boundary</span>
-              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-                This preview intentionally does not invent streaks, XP, mastery, readiness or predicted JAMB scores.
-              </p>
-            </div>
-          </aside>
+          <button
+            type="button"
+            onClick={() => {
+              setPracticeQuestions([]);
+              setPracticeSelectedAnswer(null);
+              setPracticeHasSubmitted(false);
+              setPracticeSessionType(null);
+            }}
+            className="w-full min-h-[50px] mt-3 rounded-2xl border border-white/10 bg-white/[0.045] text-white/65 text-xs font-black active:scale-[0.99] transition"
+          >
+            Reset preview
+          </button>
         </div>
       </div>
     );
