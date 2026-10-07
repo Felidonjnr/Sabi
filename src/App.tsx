@@ -2274,154 +2274,160 @@ export default function App() {
       .slice(0, 5);
 
     return (
-      <div className="space-y-4 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white p-6 md:p-8 overflow-hidden relative">
-          <div className="absolute -right-16 -top-16 w-52 h-52 rounded-full bg-[#4A90D9]/20" />
-          <div className="absolute right-16 -bottom-24 w-44 h-44 rounded-full bg-[#F5C518]/10" />
-          <div className="relative flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      <div className="space-y-6 animate-fade-in max-w-6xl mx-auto w-full">
+        <section className="relative overflow-hidden rounded-[28px] bg-white border border-slate-200 p-5 md:p-8">
+          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#2563EB]/[0.06]" />
+          <div className="absolute right-16 -bottom-28 h-52 w-52 rounded-full bg-[#F5C518]/[0.08]" />
+          <div className="relative max-w-3xl">
+            <span className="text-[10px] uppercase tracking-[0.22em] font-black text-[#2563EB]">Progress Room</span>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tight text-[#0B1220] mt-2">You’re getting stronger.</h2>
+            <p className="text-sm md:text-base text-slate-500 mt-3 max-w-2xl leading-relaxed">
+              SABI keeps the evidence from your learning sessions here so you can see what you have actually worked on.
+            </p>
+          </div>
+          <div className="relative mt-6 flex flex-wrap gap-2">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-slate-600">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2563EB]" /> {evidenceTotal} observed attempts
+            </span>
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#F8FAFC] border border-slate-200 px-3 py-2 text-[10px] font-black text-slate-600">
+              {topicsObserved} topics observed
+            </span>
+          </div>
+        </section>
+
+        <section className="rounded-[24px] bg-[#07152F] text-white p-5 md:p-7 overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
-              <span className="text-[9px] uppercase tracking-[0.22em] font-black text-[#F5C518]">Learning intelligence</span>
-              <h2 className="text-2xl md:text-3xl font-black mt-2">Progress & Mastery</h2>
-              <p className="text-sm text-white/65 mt-2 max-w-2xl leading-relaxed">
-                See the evidence SABI has collected while the learning engine remains the source of truth for mastery, readiness and recommendations.
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-white/40">Learning engine</span>
+              <h3 className="text-xl md:text-2xl font-black mt-1">Your learning state is still syncing.</h3>
+              <p className="text-xs md:text-sm text-white/55 mt-2 max-w-2xl leading-relaxed">
+                Mastery, readiness and recommendations are authoritative backend state. SABI will show them here when the learning engine supplies them.
               </p>
             </div>
-            <div className="rounded-2xl bg-white/10 border border-white/10 p-4 min-w-[220px]">
-              <span className="text-[9px] uppercase tracking-wider font-black text-white/40">Backend learning state</span>
-              <p className="text-sm font-black mt-1">Awaiting authoritative sync</p>
-              <p className="text-[10px] text-white/50 mt-1 leading-relaxed">No frontend-generated mastery or JAMB score is shown here.</p>
+            <div className="shrink-0 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+              <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-white/35">Readiness</span>
+              <span className="block text-2xl font-black font-mono mt-1">—</span>
             </div>
           </div>
         </section>
 
-        <div className="grid sm:grid-cols-3 gap-3">
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Observed attempts</span>
-            <p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{evidenceTotal}</p>
-            <p className="text-[10px] text-slate-500 mt-1">Evidence recorded in this frontend state.</p>
-          </div>
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Topics with evidence</span>
-            <p className="text-2xl font-black text-[#0A1128] font-mono mt-1">{topicsObserved}</p>
-            <p className="text-[10px] text-slate-500 mt-1">Not a mastery percentage.</p>
-          </div>
-          <div className="sabi-surface p-5">
-            <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Readiness</span>
-            <p className="text-2xl font-black text-[#0A1128] mt-1">—</p>
-            <p className="text-[10px] text-slate-500 mt-1">Supplied by the learning engine.</p>
-          </div>
-        </div>
-
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+        <section>
+          <div className="flex items-end justify-between gap-4 mb-3">
             <div>
-              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Subject evidence</span>
-              <h3 className="text-lg font-black text-[#0A1128] mt-1">Your four-subject view</h3>
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Your subjects</span>
+              <h3 className="text-xl font-black text-[#0B1220] mt-1">Where you’ve been learning</h3>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-[#F4F7FB] border border-[#D6E4F0] text-[9px] font-black text-slate-500">Backend mastery pending</span>
+            <span className="hidden sm:block text-[9px] font-black uppercase tracking-wider text-slate-400">Evidence only</span>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-3 mt-5">
-            {subjects.map(subject => {
-              const items = Object.values(masteryMap).filter(item => item.subject === subject);
-              const attempts = items.reduce((sum, item) => sum + item.attempts, 0);
-              const observedTopics = items.filter(item => item.attempts > 0).length;
-              const confidence = profile?.subjectConfidence?.[subject];
+          {subjects.length ? (
+            <div className="grid md:grid-cols-2 gap-3">
+              {subjects.map(subject => {
+                const items = Object.values(masteryMap).filter(item => item.subject === subject);
+                const attempts = items.reduce((sum, item) => sum + item.attempts, 0);
+                const observedTopics = items.filter(item => item.attempts > 0).length;
+                const confidence = profile?.subjectConfidence?.[subject];
 
-              return (
-                <button
-                  key={subject}
-                  type="button"
-                  onClick={() => { setMapSubject(subject); setActiveTab('mastery'); }}
-                  className="group rounded-2xl border border-slate-200 bg-white p-4 md:p-5 text-left hover:border-[#4A90D9] hover:shadow-sm transition"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Subject</span>
-                      <h4 className="text-sm md:text-base font-black text-[#0A1128] mt-1">{subject}</h4>
+                return (
+                  <button
+                    key={subject}
+                    type="button"
+                    onClick={() => { setMapSubject(subject); setActiveTab('mastery'); }}
+                    className="group text-left rounded-[22px] bg-white border border-slate-200 p-5 hover:border-[#2563EB]/50 hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <span className="text-[9px] uppercase tracking-[0.16em] font-black text-slate-400">Subject</span>
+                        <h4 className="text-lg font-black text-[#0B1220] mt-1">{subject}</h4>
+                      </div>
+                      <span className="h-9 w-9 rounded-xl bg-[#F8FAFC] border border-slate-200 flex items-center justify-center group-hover:bg-[#EBF4FF] transition-colors">
+                        <ChevronRight className="w-4 h-4 text-[#2563EB]" />
+                      </span>
                     </div>
-                    <span className="w-9 h-9 rounded-xl bg-[#F4F7FB] border border-[#D6E4F0] flex items-center justify-center group-hover:bg-[#EBF1FA] transition">
-                      <ChevronRight className="w-4 h-4 text-[#4A90D9]" />
-                    </span>
-                  </div>
 
-                  <div className="grid grid-cols-3 gap-2 mt-5">
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Attempts</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{attempts}</span>
+                    <div className="mt-6 flex items-end gap-6">
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Attempts</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{attempts}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Topics</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{observedTopics}</span>
+                      </div>
+                      <div>
+                        <span className="block text-[8px] uppercase tracking-wider font-black text-slate-400">Confidence</span>
+                        <span className="block text-2xl font-black font-mono text-[#0B1220] mt-1">{confidence ? `${confidence}/5` : '—'}</span>
+                      </div>
                     </div>
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Topics</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{observedTopics}</span>
-                    </div>
-                    <div className="rounded-xl bg-[#F8FAFC] border border-slate-100 p-3">
-                      <span className="block text-[8px] uppercase font-black text-slate-400">Confidence</span>
-                      <span className="block text-lg font-black font-mono text-[#0A1128] mt-1">{confidence ? `${confidence}/5` : '—'}</span>
-                    </div>
-                  </div>
 
-                  <div className="mt-4 flex items-center justify-between text-[9px] font-bold">
-                    <span className="text-slate-400">Open mastery map</span>
-                    <span className="text-[#4A90D9]">View topics →</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+                    <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400">Observed learning evidence</span>
+                      <span className="text-[10px] font-black text-[#2563EB]">Open topics →</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[22px] border border-dashed border-slate-300 bg-white p-8 text-center">
+              <h4 className="text-sm font-black text-[#0B1220]">Your subjects will appear here.</h4>
+              <p className="text-xs text-slate-500 mt-2">Subject selection will appear after onboarding sync.</p>
+            </div>
+          )}
         </section>
 
         <div className="grid lg:grid-cols-[1fr_320px] gap-4">
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center justify-between gap-3">
+          <section className="rounded-[24px] bg-white border border-slate-200 p-5 md:p-6">
+            <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#4A90D9]">Observed learning evidence</span>
-                <h3 className="text-lg font-black text-[#0A1128] mt-1">Recent topic activity</h3>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Recent evidence</span>
+                <h3 className="text-xl font-black text-[#0B1220] mt-1">What you’ve worked on</h3>
               </div>
-              <span className="text-[9px] font-black uppercase text-slate-400">{recentEvidence.length} shown</span>
+              {recentEvidence.length > 0 && <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">{recentEvidence.length} shown</span>}
             </div>
 
             {recentEvidence.length > 0 ? (
-              <div className="space-y-2 mt-5">
+              <div className="mt-5 space-y-2">
                 {recentEvidence.map(item => (
-                  <div key={`${item.subject}-${item.topic}-${item.subtopic}`} className="rounded-2xl border border-slate-200 bg-white p-3.5 flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#EBF1FA] border border-[#D6E4F0] flex items-center justify-center shrink-0">
-                      <BookOpen className="w-4 h-4 text-[#4A90D9]" />
+                  <div key={`${item.subject}-${item.topic}-${item.subtopic}`} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-[#F8FAFC] p-3.5">
+                    <div className="h-9 w-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0">
+                      <BookOpen className="w-4 h-4 text-[#2563EB]" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-black text-[#0A1128] truncate">{item.topic}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.subject} • {item.attempts} observed attempt{item.attempts === 1 ? '' : 's'}</p>
+                      <p className="text-xs font-black text-[#0B1220] truncate">{item.topic}</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5 truncate">{item.subject} · {item.attempts} observed attempt{item.attempts === 1 ? '' : 's'}</p>
                     </div>
-                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">
-                      Evidence
-                    </span>
+                    <span className="text-[9px] font-black uppercase text-slate-400 shrink-0">Observed</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] p-6 text-center">
-                <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto">
+              <div className="mt-5 rounded-2xl border border-dashed border-slate-200 bg-[#F8FAFC] p-7 text-center">
+                <div className="h-10 w-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center mx-auto">
                   <BookOpen className="w-4 h-4 text-slate-400" />
                 </div>
-                <h4 className="text-sm font-black text-[#0A1128] mt-3">No observed topic evidence yet</h4>
+                <h4 className="text-sm font-black text-[#0B1220] mt-3">Your progress starts with evidence.</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Complete a practice or diagnostic session and the connected learning engine can populate this view.</p>
+                <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 px-4 py-2.5 rounded-xl bg-[#2563EB] text-white text-[10px] font-black uppercase tracking-wider">Start Practice</button>
               </div>
             )}
           </section>
 
-          <aside className="space-y-3">
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <aside className="space-y-4">
+            <div className="rounded-[22px] border border-amber-200 bg-amber-50 p-5">
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-amber-700" />
-                <span className="text-[9px] uppercase tracking-wider font-black text-amber-900">Important</span>
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-amber-900">How to read this room</span>
               </div>
               <h4 className="text-sm font-black text-amber-950 mt-2">Missing evidence is not zero mastery.</h4>
-              <p className="text-xs text-amber-800 mt-2 leading-relaxed">An unassessed topic should remain unassessed until the backend learning engine has enough evidence to determine its state.</p>
+              <p className="text-xs text-amber-800 mt-2 leading-relaxed">An unassessed topic stays unassessed until the learning engine has enough evidence to determine its state.</p>
             </div>
-            <div className="sabi-surface p-5">
-              <span className="text-[9px] uppercase tracking-wider font-black text-slate-400">Next action</span>
-              <h4 className="text-sm font-black text-[#0A1128] mt-1">Build more evidence</h4>
-              <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">Practice now and let the connected learning engine update your learning state.</p>
-              <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 w-full py-3 rounded-xl bg-[#F5C518] text-[#0A1128] text-[10px] font-black uppercase tracking-wider">Open Practice</button>
+
+            <div className="rounded-[22px] bg-[#F8FAFC] border border-slate-200 p-5">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-slate-400">Next move</span>
+              <h4 className="text-base font-black text-[#0B1220] mt-1">Build useful evidence.</h4>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">Practice a topic and return here to see what SABI has learned about your preparation.</p>
+              <button type="button" onClick={() => setActiveTab('practice')} className="mt-4 w-full min-h-[48px] rounded-xl bg-[#0B1220] text-white text-[10px] font-black uppercase tracking-wider hover:bg-[#16213A] transition-colors">Open Practice</button>
             </div>
           </aside>
         </div>
