@@ -1833,145 +1833,124 @@ export default function App() {
     if (!profile) return null;
 
     const tabsList = [
-      { id: 'home', label: 'Home', icon: Home, action: () => { setActiveTab('home'); } },
+      { id: 'home', label: 'Home', icon: Home, action: () => setActiveTab('home') },
       { id: 'practice', label: 'Practice', icon: Play, action: () => { setActiveTab('practice'); setPracticeSessionType(null); } },
-      { id: 'blitz', label: 'Blitz', icon: Zap, action: () => { setActiveTab('blitz'); } },
-      { id: 'cbt', label: 'CBT', icon: FileText, action: () => { setActiveTab('cbt'); } },
-      { id: 'progress', label: 'Progress', icon: ArrowUpRight, action: () => { setActiveTab('progress'); } },
-      { id: 'profile', label: 'Profile', icon: User, action: () => { setActiveTab('profile'); } },
-      { id: 'settings', label: 'Settings', icon: Settings, action: () => { setActiveTab('settings'); } },
+      { id: 'blitz', label: 'Blitz', icon: Zap, action: () => setActiveTab('blitz') },
+      { id: 'cbt', label: 'CBT', icon: FileText, action: () => setActiveTab('cbt') },
+      { id: 'progress', label: 'Progress', icon: ArrowUpRight, action: () => setActiveTab('progress') },
+      { id: 'profile', label: 'Profile', icon: User, action: () => setActiveTab('profile') },
+      { id: 'settings', label: 'Settings', icon: Settings, action: () => setActiveTab('settings') },
     ];
 
+    const focusRoom = activeTab === 'blitz' || activeTab === 'cbt' || activeTab === 'aitutor' || (activeTab === 'practice' && practiceSessionType !== null);
+
+    const pageNames: Record<string, { title: string; subtitle: string }> = {
+      practice: { title: practiceSessionType === 'smart' ? 'Smart Practice' : practiceSessionType === 'custom' ? 'Custom Practice' : 'Practice', subtitle: 'Choose how you want to work.' },
+      progress: { title: 'Progress Room', subtitle: 'See the learning evidence SABI has collected.' },
+      recommendations: { title: 'Next Move', subtitle: 'Know what to do next.' },
+      mastery: { title: 'Learning Evidence', subtitle: 'Explore your learning map.' },
+      leaderboard: { title: 'Leaderboard', subtitle: 'Community data will appear when the service is connected.' },
+      profile: { title: 'Profile', subtitle: 'Your learning context and JAMB goals.' },
+      settings: { title: 'Settings', subtitle: 'Make SABI work for you.' },
+      mobile: { title: 'Mobile Prototype', subtitle: 'Inspect the native experience.' },
+    };
+
+    const currentPage = pageNames[activeTab] || { title: 'SABI', subtitle: '' };
+
     return (
-      <div className="flex-1 flex flex-col md:flex-row bg-[#F4F7FB] text-slate-800 animate-fade-in shrink-0 relative min-h-[600px] rounded-2xl overflow-hidden border border-[#D6E4F0] shadow-sm">
-        
-        {/* Left Sidebar for Desktop Web */}
-        <aside className="hidden md:flex md:w-64 bg-[#0A1128] text-white flex-col justify-between shrink-0 p-6 border-r border-[#D6E4F0]/10 z-30">
-          <div className="space-y-6">
-            {/* User Profile Badge */}
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#F5C518] to-yellow-300 text-[#0A1128] flex items-center justify-center font-black text-sm uppercase shadow shrink-0">
-                  {profile.name.trim() ? profile.name.trim()[0] : '?'}
-                </div>
-                <div className="truncate">
-                  <h4 className="text-xs font-black truncate text-white">{profile.name}</h4>
-                  <p className="text-[9px] text-sky-200/80 uppercase font-mono tracking-wider">{profile.classLevel}</p>
-                </div>
-              </div>
-              <div className="border-t border-white/10 pt-2.5">
-                <p className="text-[9px] text-slate-400">Target Goal:</p>
-                <p className="text-[10px] font-bold text-[#F5C518] truncate leading-tight mt-0.5">
-                  {profile.targetCourse}
-                </p>
-                <p className="text-[9px] font-bold text-slate-300 truncate leading-tight mt-0.5">
-                  at {profile.targetUniversity}
-                </p>
-                <p className="text-[10px] font-bold text-sky-300 mt-1">Exam schedule pending sync</p>
-              </div>
-              <div className="flex justify-between items-center text-[10px] bg-white/10 px-2 py-1 rounded-lg">
-                <span className="text-slate-300">Account sync:</span>
-                <span className="font-extrabold text-[#F5C518]">Pending</span>
-              </div>
+      <div className="flex-1 flex flex-col md:flex-row bg-[#F8FAFC] text-[#0B1220] animate-fade-in shrink-0 relative min-h-[600px] overflow-hidden border border-[#DCE7F2] shadow-sm">
+        <aside className="hidden md:flex md:w-[248px] bg-white flex-col justify-between shrink-0 border-r border-[#E5EDF6] z-30">
+          <div>
+            <div className="px-5 pt-6 pb-5">
+              <button type="button" onClick={() => setActiveTab('home')} className="flex items-center gap-2.5 text-left">
+                <span className="w-9 h-9 rounded-xl bg-[#07152F] text-white flex items-center justify-center font-black text-lg">S</span>
+                <span>
+                  <span className="block text-[15px] font-black tracking-tight">SABI</span>
+                  <span className="block text-[8px] uppercase tracking-[0.18em] font-black text-[#94A3B8] mt-0.5">JAMB learning</span>
+                </span>
+              </button>
             </div>
 
-            {/* Nav Menu */}
-            <nav className="space-y-1">
-              {tabsList.map((tab) => {
+            <nav className="px-3 space-y-1">
+              <p className="px-3 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Learn</p>
+              {tabsList.slice(0, 5).map(tab => {
+                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id && !focusRoom;
+                return (
+                  <button key={tab.id} type="button" onClick={tab.action}
+                    className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
+                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
+                    }`}>
+                    <IconComponent className="w-4 h-4 shrink-0" />
+                    <span>{tab.label}</span>
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
+                  </button>
+                );
+              })}
+
+              <p className="px-3 pt-5 pb-2 text-[8px] uppercase tracking-[0.2em] font-black text-[#A1AFC0]">Account</p>
+              {tabsList.slice(5).map(tab => {
                 const IconComponent = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
-                  <button
-                    key={tab.id}
-                    onClick={tab.action}
-                    className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold transition ${
-                      isActive 
-                        ? 'bg-[#F5C518] text-[#0A1128] shadow-md border-2 border-[#0A1128]' 
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                    }`}
-                  >
-                    <IconComponent className="h-4 w-4 shrink-0" />
+                  <button key={tab.id} type="button" onClick={tab.action}
+                    className={`w-full min-h-[44px] flex items-center gap-3 px-3 rounded-xl text-xs font-black transition active:scale-[.99] ${
+                      isActive ? 'bg-[#EAF3FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1220]'
+                    }`}>
+                    <IconComponent className="w-4 h-4 shrink-0" />
                     <span>{tab.label}</span>
+                    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#2563EB]" />}
                   </button>
                 );
               })}
             </nav>
           </div>
 
-          {/* Quick Exit */}
-          <div className="border-t border-white/10 pt-4">
-            <button 
-              onClick={handleResetProfileSystem} 
-              className="w-full py-2 bg-rose-950/40 border border-rose-900/50 hover:bg-rose-900/40 text-rose-300 rounded-xl text-[10px] font-bold uppercase tracking-wider transition"
-            >
-              Reset Portal
+          <div className="p-4 border-t border-[#E5EDF6]">
+            <div className="rounded-2xl bg-[#F8FAFC] border border-[#E5EDF6] p-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#07152F] text-[#F5C518] flex items-center justify-center text-xs font-black">
+                  {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-black truncate">{profile.name}</p>
+                  <p className="text-[9px] text-[#64748B] truncate mt-0.5">{profile.targetCourse || 'JAMB candidate'}</p>
+                </div>
+              </div>
+            </div>
+            <button type="button" onClick={handleResetProfileSystem}
+              className="w-full min-h-[38px] rounded-xl text-[9px] uppercase tracking-wider font-black text-[#64748B] border border-[#DCE7F2] hover:border-rose-200 hover:text-rose-600 transition">
+              Exit preview
             </button>
           </div>
         </aside>
 
-        {/* Main Content Pane */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#F4F7FB]">
-          
-          {/* Header row for Mobile view / Status display for Web */}
-          {activeTab !== 'home' && (
-          <header className={`bg-gradient-to-r from-[#0A1128] to-[#4A90D9] p-4 text-white shadow-sm shrink-0 md:bg-white md:text-slate-850 md:from-white md:to-white md:border-b md:border-[#D6E4F0] ${activeTab === 'practice' ? 'flex justify-center md:justify-start' : 'flex justify-between items-center'}`}>
-            {activeTab === 'practice' ? (
-              <h1 className="text-sm md:text-base font-black uppercase tracking-widest text-[#F5C518] md:text-[#0A1128]">
-                {practiceSessionType === null 
-                  ? "Practice Portal" 
-                  : practiceSessionType === 'smart' 
-                    ? "Smart Practice: Adaptive Mix" 
-                    : `Custom Practice: ${customPracticeSubject}`}
-              </h1>
-            ) : activeTab === 'home' ? (
-              <>
-                <div className="flex items-center gap-2.5 md:hidden">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#F5C518] to-yellow-300 text-[#0A1128] flex items-center justify-center font-black text-sm shadow">
-                    {profile.name[0]}
-                  </div>
-                  <div className="truncate flex flex-col justify-center">
-                    <h4 className="text-xs font-extrabold truncate max-w-[120px] text-white">{profile.name}</h4>
-                    <p className="text-[8px] text-sky-100/95 leading-none mt-1">Goal: {profile.targetCourse}</p>
-                    <p className="text-[8px] font-bold text-sky-300 mt-1">Exam schedule pending</p>
-                  </div>
-                </div>
-
-                {/* Desktop status row */}
-                <div className="hidden md:flex items-center gap-3">
-                  <span className="text-xs font-bold text-slate-500">Active Workspace:</span>
-                  <span className="text-xs font-extrabold text-[#0A1128] bg-[#EBF1FA] px-3 py-1 rounded-full border border-[#D0E1F9] uppercase tracking-wide">
-                    Home Dashboard
-                  </span>
-                  <div className="h-4 w-px bg-slate-200" />
-                  <span className="text-xs text-slate-500">Exam schedule:</span>
-                  <span className="text-xs font-black text-[#4A90D9]">Awaiting backend sync</span>
-                </div>
-
-                {/* Right Header Side Badge */}
-                <div className="flex items-center gap-2">
-                  <div className="flex md:hidden items-center gap-1 bg-white/10 px-2 py-1 rounded-full border border-white/20">
-                    <Zap className="h-3.5 w-3.5 text-[#F5C518] fill-current" />
-                    <span className="text-[10px] font-black">Account sync pending</span>
-                  </div>
-                  
-                  <div className="hidden md:flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-xl border border-yellow-200 text-[#0A1128]">
-                    <Zap className="h-4 w-4 text-[#F5C518] fill-current" />
-                    <span className="text-xs font-black">Account sync pending</span>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center">
-                <span className="text-sm md:text-base font-black uppercase tracking-widest text-[#F5C518] md:text-[#0A1128]">
-                  {activeTab === 'mastery' ? 'Learning Evidence' : activeTab === 'aitutor' ? 'AI Coach Hub' : activeTab === 'leaderboard' ? 'Standings Leaderboard' : activeTab === 'mobile' ? 'Mobile App Prototype' : activeTab === 'settings' ? 'Settings' : activeTab === 'blitz' ? 'Blitz' : activeTab === 'cbt' ? 'CBT Simulator' : activeTab === 'progress' ? 'Progress' : activeTab === 'recommendations' ? 'Recommendations' : 'Account Details'}
-                </span>
+        <div className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC]">
+          {!focusRoom && activeTab !== 'home' && (
+            <header className="hidden md:flex h-[68px] shrink-0 items-center justify-between px-6 bg-white border-b border-[#E5EDF6]">
+              <div>
+                <p className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">{currentPage.title}</p>
+                <h2 className="text-sm font-black text-[#0B1220] mt-0.5">{currentPage.subtitle}</h2>
               </div>
-            )}
-          </header>
+              <div className="flex items-center gap-3">
+                <div className="h-8 px-3 rounded-full border border-[#E5EDF6] bg-[#F8FAFC] flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#F5C518]" />
+                  <span className="text-[9px] font-black text-[#64748B]">Learning engine</span>
+                </div>
+                <div className="w-9 h-9 rounded-full bg-[#EAF3FF] border border-[#DCE7F2] text-[#2563EB] flex items-center justify-center text-xs font-black">
+                  {(profile.name || '?').trim()[0]?.toUpperCase() || '?'}
+                </div>
+              </div>
+            </header>
           )}
 
-          {/* Tab Content Canvas context */
-          <div className={`flex-1 ${((activeTab === 'practice' && practiceSessionType === null) || activeTab === 'aitutor') ? 'overflow-hidden flex flex-col bg-[#F4F7FB] p-3 md:p-4 pb-4 md:pb-4' : 'overflow-y-auto p-4 md:p-6 pb-20 md:pb-6'} relative break-words`}>
+          <div className={`flex-1 ${
+            ((activeTab === 'practice' && practiceSessionType === null) || activeTab === 'aitutor')
+              ? 'overflow-hidden flex flex-col bg-[#F8FAFC] p-3 md:p-4 pb-4 md:pb-4'
+              : focusRoom
+                ? 'overflow-y-auto p-0 pb-20 md:pb-0'
+                : 'overflow-y-auto p-4 md:p-6 pb-20 md:pb-6'
+          } relative break-words`}>
             {activeTab === 'home' && renderHomeTab()}
             {activeTab === 'practice' && renderPracticeTab()}
             {activeTab === 'blitz' && renderBlitzTab()}
@@ -1985,21 +1964,26 @@ export default function App() {
             {activeTab === 'aitutor' && renderAITutorTab()}
             {activeTab === 'mobile' && renderMobileTab()}
           </div>
-          
-          {/* Bottom Mobile Tab Bar (Hidden on Desktop) */}
-          <div className={`md:hidden fixed bottom-0 left-0 right-0 h-[68px] border-t z-50 flex justify-around items-center pb-1 px-2 backdrop-blur-xl ${theme === 'dark' ? 'bg-[#07152F]/95 border-white/10 text-white' : 'bg-white/95 border-[#DCE7F2] text-[#0B1220]'}`}>
-            {tabsList.filter(tab => ['home','practice','blitz','cbt','profile'].includes(tab.id)).map((tab) => {
+
+          <div className={`md:hidden fixed bottom-0 left-0 right-0 h-[68px] border-t z-50 flex justify-around items-center pb-1 px-2 backdrop-blur-xl ${
+            theme === 'dark' ? 'bg-[#07152F]/95 border-white/10 text-white' : 'bg-white/95 border-[#DCE7F2] text-[#0B1220]'
+          }`}>
+            {tabsList.filter(tab => ['home','practice','blitz','cbt','profile'].includes(tab.id)).map(tab => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button key={tab.id} onClick={tab.action} className={`min-w-[52px] min-h-[52px] flex flex-col items-center justify-center gap-1 rounded-2xl text-[9px] font-bold transition active:scale-95 ${isActive ? (theme === 'dark' ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]') : (theme === 'dark' ? 'text-white/55' : 'text-[#64748B]')}`}>
-                  <IconComponent className="h-4.5 w-4.5" />
+                <button key={tab.id} type="button" onClick={tab.action}
+                  className={`min-w-[52px] min-h-[52px] flex flex-col items-center justify-center gap-1 rounded-2xl text-[9px] font-black transition active:scale-95 ${
+                    isActive
+                      ? (theme === 'dark' ? 'bg-[#1457C7] text-white' : 'bg-[#EAF3FF] text-[#2563EB]')
+                      : (theme === 'dark' ? 'text-white/55' : 'text-[#64748B]')
+                  }`}>
+                  <IconComponent className="h-4 w-4" />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
-
         </div>
       </div>
     );
