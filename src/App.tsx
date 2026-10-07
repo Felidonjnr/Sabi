@@ -3132,72 +3132,153 @@ export default function App() {
 
   // --- SUB-PANE: DASHBOARD SETTINGS TAB ---
   function renderSettingsTab() {
+    if (!profile) return null;
+
+    const preferenceRows = [
+      ['Language', profile.languagePreference || 'Not set'],
+      ['Explanation style', profile.explanationPreference || 'Not set'],
+    ];
+
+    const accountRows = [
+      ['Plan', 'Pending sync'],
+      ['Entitlements', 'Pending sync'],
+      ['AI credits', 'Pending sync'],
+    ];
+
     return (
-      <div className="space-y-5 animate-fade-in max-w-5xl mx-auto w-full">
-        <section className="rounded-3xl bg-[#0A1128] text-white overflow-hidden">
-          <div className="p-6 md:p-8">
-            <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#F5C518]">Account control center</span>
-            <h2 className="text-2xl md:text-4xl font-black mt-2">Settings</h2>
-            <p className="text-sm text-white/55 mt-2 max-w-2xl">Keep your learning preferences, access state and session controls in one place. Account-changing actions will be connected to the appropriate backend services.</p>
-          </div>
-        </section>
+      <div className="min-h-full bg-[#F8FAFC] text-[#0B1220] animate-fade-in pb-24">
+        <div className="max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-7 space-y-5">
+          <header className="flex items-end justify-between gap-4">
+            <div>
+              <span className="text-[9px] uppercase tracking-[0.2em] font-black text-[#2563EB]">Settings</span>
+              <h1 className="text-[30px] md:text-4xl leading-tight tracking-[-0.04em] font-black mt-1">Make SABI work for you.</h1>
+              <p className="text-sm text-[#64748B] mt-2 max-w-xl leading-relaxed">
+                Control your learning preferences, account access and current session.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('profile')}
+              className="hidden md:inline-flex min-h-[42px] px-4 rounded-xl border border-[#DCE7F2] bg-white text-xs font-black"
+            >
+              Back to profile
+            </button>
+          </header>
 
-        <div className="grid lg:grid-cols-2 gap-5">
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#EBF4FF] flex items-center justify-center"><Sliders className="w-4 h-4 text-[#4A90D9]" /></div>
-              <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Learning</span><h3 className="text-base font-black text-[#0A1128]">Preferences</h3></div>
+          <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+            <div className="px-5 pt-5 pb-3">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Learning preferences</span>
+              <h2 className="text-lg font-black mt-1">How SABI teaches you</h2>
             </div>
-            <div className="mt-5 space-y-3">
-              <div className="rounded-2xl border border-[#D6E4F0] p-4">
-                <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">Language preference</span>
-                <p className="text-xs font-black text-[#0A1128] mt-1">{profile?.languagePreference || 'Not set'}</p>
-              </div>
-              <div className="rounded-2xl border border-[#D6E4F0] p-4">
-                <span className="block text-[8px] uppercase tracking-widest font-black text-slate-400">Explanation style</span>
-                <p className="text-xs font-black text-[#0A1128] mt-1">{profile?.explanationPreference || 'Not set'}</p>
-              </div>
-            </div>
-            <button type="button" disabled className="mt-4 w-full py-3 rounded-xl border border-slate-200 text-slate-400 text-xs font-black uppercase tracking-wider cursor-not-allowed">Edit preferences — API pending</button>
-          </section>
 
-          <section className="sabi-surface p-5 md:p-6">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-[#FFF8D8] flex items-center justify-center"><Lock className="w-4 h-4 text-[#0A1128]" /></div>
-              <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Commercial</span><h3 className="text-base font-black text-[#0A1128]">Access & billing</h3></div>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mt-5">
-              {['Plan','Entitlements','AI credits'].map(label => (
-                <div key={label} className="rounded-xl bg-[#F8FBFF] border border-[#D6E4F0] p-3">
-                  <span className="block text-[8px] uppercase font-black text-slate-400">{label}</span>
-                  <p className="text-[10px] font-black text-[#0A1128] mt-1">Pending sync</p>
+            <div className="divide-y divide-[#EEF3F8]">
+              {preferenceRows.map(([label, value]) => (
+                <div key={label} className="px-5 py-4 flex items-center justify-between gap-5">
+                  <div className="min-w-0">
+                    <p className="text-xs font-black">{label}</p>
+                    <p className="text-[10px] text-[#64748B] mt-1 truncate max-w-[260px]">{value}</p>
+                  </div>
+                  <span className="shrink-0 text-[9px] uppercase tracking-wider font-black text-[#94A3B8]">API pending</span>
                 </div>
               ))}
             </div>
-            <p className="text-[10px] text-slate-500 mt-4 leading-relaxed">Payment status, subscription, entitlements and credit balances are authoritative server state.</p>
-            <button type="button" disabled className="mt-3 w-full py-3 rounded-xl border border-slate-200 text-slate-400 text-xs font-black uppercase tracking-wider cursor-not-allowed">Manage access — API pending</button>
-          </section>
-        </div>
 
-        <section className="sabi-surface p-5 md:p-6">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#F8FBFF] border border-[#D6E4F0] flex items-center justify-center"><ShieldAlert className="w-4 h-4 text-[#4A90D9]" /></div>
-            <div><span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Session</span><h3 className="text-base font-black text-[#0A1128]">Security & recovery</h3></div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-3 mt-5">
-            <div className="rounded-2xl border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Authentication</span>
-              <p className="text-xs font-black text-[#0A1128] mt-1">Session service pending</p>
-              <p className="text-[10px] text-slate-500 mt-2">Production logout and session invalidation will be handled by the authentication service.</p>
+            <div className="px-5 pb-5">
+              <button
+                type="button"
+                disabled
+                className="w-full min-h-[48px] rounded-2xl border border-[#DCE7F2] bg-[#F8FAFC] text-[#94A3B8] text-xs font-black cursor-not-allowed"
+              >
+                Edit preferences
+              </button>
             </div>
-            <div className="rounded-2xl border border-[#D6E4F0] p-4">
-              <span className="text-[9px] uppercase tracking-widest font-black text-slate-400">Frontend preview</span>
-              <p className="text-xs font-black text-[#0A1128] mt-1">Local state only</p>
-              <p className="text-[10px] text-slate-500 mt-2">Use this only to leave the current frontend preview while backend auth is not connected.</p>
+          </section>
+
+          <section className="rounded-[24px] bg-[#07152F] text-white overflow-hidden">
+            <div className="p-5 md:p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#F5C518]">Account & access</span>
+                  <h2 className="text-lg font-black mt-1">What your account can use</h2>
+                </div>
+                <Lock className="w-4 h-4 text-white/35 mt-1 shrink-0" />
+              </div>
+
+              <div className="mt-5 divide-y divide-white/10 border-y border-white/10">
+                {accountRows.map(([label, value]) => (
+                  <div key={label} className="py-3.5 flex items-center justify-between gap-4">
+                    <span className="text-xs font-bold text-white/70">{label}</span>
+                    <span className="text-[9px] uppercase tracking-wider font-black text-white/40">{value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-[10px] text-white/45 leading-relaxed mt-4">
+                Subscription, payment state, entitlements and AI credit balances are server-owned. This preview will never invent those values.
+              </p>
+
+              <button
+                type="button"
+                disabled
+                className="mt-4 w-full min-h-[48px] rounded-2xl bg-white/[0.06] border border-white/10 text-white/35 text-xs font-black cursor-not-allowed"
+              >
+                Manage access — API pending
+              </button>
             </div>
-          </div>
-          <button type="button" onClick={handleResetProfileSystem} className="mt-4 w-full md:w-auto px-5 py-3 rounded-xl bg-[#0A1128] text-white text-xs font-black uppercase tracking-wider">Exit frontend preview</button>
-        </section>
+          </section>
+
+          <section className="rounded-[24px] bg-white border border-[#DCE7F2] overflow-hidden">
+            <div className="px-5 pt-5 pb-3">
+              <span className="text-[9px] uppercase tracking-[0.18em] font-black text-[#2563EB]">Security & session</span>
+              <h2 className="text-lg font-black mt-1">Stay in control</h2>
+            </div>
+
+            <div className="px-5 pb-5 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E7EEF7] p-4">
+                <span className="text-[8px] uppercase tracking-[0.16em] font-black text-[#94A3B8]">Authentication</span>
+                <p className="text-xs font-black mt-1">Session service pending</p>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-2">
+                  Production sign-out and session invalidation will be handled by the authentication service.
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-[#F8FAFC] border border-[#E7EEF7] p-4">
+                <span className="text-[8px] uppercase tracking-[0.16em] font-black text-[#94A3B8]">Current environment</span>
+                <p className="text-xs font-black mt-1">Frontend preview</p>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-2">
+                  Changes in this preview are local state until the account service is connected.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="rounded-[24px] border border-rose-200 bg-rose-50/60 p-5">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white border border-rose-200 flex items-center justify-center shrink-0">
+                <ShieldAlert className="w-4 h-4 text-rose-600" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9px] uppercase tracking-[0.18em] font-black text-rose-500">Preview exit</span>
+                <h2 className="text-sm font-black mt-1 text-[#0B1220]">Leave this frontend preview</h2>
+                <p className="text-[10px] text-[#64748B] leading-relaxed mt-1">
+                  This resets the current preview profile and returns to the starting account flow. It does not delete production account data.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleResetProfileSystem}
+              className="mt-4 w-full min-h-[50px] rounded-2xl bg-[#0B1220] text-white text-xs font-black active:scale-[.99] transition"
+            >
+              Exit frontend preview
+            </button>
+          </section>
+
+          <p className="text-center text-[9px] text-[#94A3B8] leading-relaxed px-5">
+            SABI keeps authoritative account, access and learning-engine state on the server. This screen only presents what is currently available.
+          </p>
+        </div>
       </div>
     );
   }
