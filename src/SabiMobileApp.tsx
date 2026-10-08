@@ -314,7 +314,8 @@ export default function SabiMobileApp() {
       case 'question': return <Question go={go}/>;
       case 'results': return <Results go={go}/>;
       case 'progress': return <Progress go={go}/>;
-      case 'blitz': return <Blitz go={go}/>;\n      case 'blitzActive': return <BlitzActive go={go}/>;
+      case 'blitz': return <Blitz go={go}/>;
+      case 'blitzActive': return <BlitzActive go={go}/>;
       case 'blitzSetup': return <BlitzSetup go={go}/>;
       case 'cbt': return <CBTSetup go={go}/>;
       case 'cbtActive': return <Question go={go} cbt/>;
